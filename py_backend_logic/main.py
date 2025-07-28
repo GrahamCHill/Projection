@@ -1,8 +1,11 @@
+import json
+from urllib.request import Request
 from dotenv import load_dotenv
 import os
 from groq import Groq
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
 import uvicorn
 
 # Load the .env file
@@ -10,6 +13,8 @@ load_dotenv()
 
 # Create FastAPI app
 app = FastAPI(title="CV Quality Scanner API")
+DATA_DIR = Path("data")
+DATA_DIR.mkdir(exist_ok=True)
 
 # Configure CORS
 app.add_middleware(
@@ -42,6 +47,14 @@ async def test_groq():
     )
     
     return {"response": response.choices[0].message.content}
+
+@app.post("/save-json/{filename}")
+async def save_json(filename: str, request: Request):
+    data = await request.json()
+    file_path = DATA_DIR / f"{filename}.json"
+    with open(file_path, "w") as f:
+        json.dump(data, f)
+    return {"message": f"Saved {filename}.json"}
 
 # This allows the file to be run directly with python
 if __name__ == "__main__":
