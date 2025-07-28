@@ -1,5 +1,6 @@
 import json
 from fastapi import Request
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
 from groq import Groq
