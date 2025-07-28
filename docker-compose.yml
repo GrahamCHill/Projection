@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./py_backend_logic
+      dockerfile: Dockerfile
+    container_name: cv_scanner_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      - ./py_backend_logic:/app
+    restart: unless-stopped
+    networks:
+      - cv_scanner_network
+
+  frontend:
+    build:
+      context: ./react_frontend
+      dockerfile: Dockerfile
+    container_name: cv_scanner_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - cv_scanner_network
+
+networks:
+  cv_scanner_network:
+    driver: bridge
