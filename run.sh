@@ -50,7 +50,7 @@ echo -e "${GREEN}Installing/updating Python dependencies...${NC}"
 pip install -r requirements.txt
 
 # Start the FastAPI server in the background
-echo -e "${GREEN}Starting FastAPI server on http://localhost:5000${NC}"
+echo -e "${GREEN}Starting FastAPI server on http://localhost:8000${NC}"
 python main.py &
 BACKEND_PID=$!
 
@@ -85,7 +85,7 @@ trap cleanup SIGINT SIGTERM
 
 echo -e "${GREEN}=================================${NC}"
 echo -e "${GREEN}   Servers are now running!      ${NC}"
-echo -e "${GREEN}   Backend: http://localhost:5000${NC}"
+echo -e "${GREEN}   Backend: http://localhost:8000${NC}"
 echo -e "${GREEN}   Frontend: http://localhost:5173${NC}"
 echo -e "${GREEN}   Press Ctrl+C to stop servers  ${NC}"
 echo -e "${GREEN}=================================${NC}"

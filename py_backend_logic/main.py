@@ -1,5 +1,5 @@
 import json
-from urllib.request import Request
+from fastapi import Request
 from dotenv import load_dotenv
 import os
 from groq import Groq
@@ -56,6 +56,16 @@ async def save_json(filename: str, request: Request):
         json.dump(data, f)
     return {"message": f"Saved {filename}.json"}
 
+@app.get("/load-json/{filename}")
+def load_json(filename: str):
+    file_path = DATA_DIR / f"{filename}.json"
+    if not file_path.exists():
+        return JSONResponse(status_code=404, content={"error": "File not found"})
+    with open(file_path) as f:
+        data = json.load(f)
+    return data
+
+
 # This allows the file to be run directly with python
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
