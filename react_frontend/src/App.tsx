@@ -10,7 +10,7 @@ function App() {
     const [saveFilename, setSaveFilename] = useState("");
     const [loadFilename, setLoadFilename] = useState("");
     const [availableFiles, setAvailableFiles] = useState<string[]>([]);
-    const [loadedData, setLoadedData] = useState<any>(null);
+    const [loadedData, setLoadedData] = useState<never>();
 
     // Fetch available JSON files from backend
     useEffect(() => {
