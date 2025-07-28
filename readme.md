@@ -67,3 +67,13 @@ also report issues or suggest features by opening an issue in the repository.
 ## License
 The CV Quality Scanner is licensed under the MIT License. See the LICENSE file for more details.
 
+### Acknowledgements
+This project is inspired by a project created by my one of my superiors at work, who used it to scan CVs for quality
+and compliance with best practices. I have just adapted it to have a more user-friendly interface and to be more flexible
+in regard to the extensibility of both the frontend and backend. 
+
+This project uses the Grok AI API to perform the CV quality checks. Grok is a powerful AI provider that offers a wide
+range of AI services, including natural language processing, computer vision, and more. You can learn more about Grok
+and sign up for an account at https://grok.com/.
+
+
