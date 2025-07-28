@@ -66,6 +66,10 @@ def load_json(filename: str):
         data = json.load(f)
     return data
 
+@app.get("/list-json")
+def list_json_files():
+    files = [f.name for f in DATA_DIR.glob("*.json")]
+    return {"files": files}
 
 # This allows the file to be run directly with python
 if __name__ == "__main__":
