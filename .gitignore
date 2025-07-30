@@ -2,3 +2,7 @@
 .DS_STORE
 .idea
 py_backend_logic/data/*
+node_modules/scheduler/*
+node_modules/set-cookie-parser/
+/node_modules/react
+/node_modules
