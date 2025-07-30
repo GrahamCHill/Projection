@@ -11,13 +11,40 @@ frontend interface that allows you to upload a CV file and scan it for quality i
 feedback on how to improve the CV and increase its chances of getting hired.
 
 ## Requirements
-The CV Quality Scanner requier that you have signed up for an account with Grok (or another AI provider) and have
-obtained an API key. You will need to set the `GROK_API_KEY` environment variable to your API key before running
-the script. You can do this be creating a `.env` file in the py_backend_logic directory with the following content:
+The CV Quality Scanner requires that you have signed up for an account with Groq (or another AI provider) and have
+obtained an API key. You will need to set the `GROQ_API_KEY` environment variable to your API key before running
+the script. You can do this by creating a `.env` file in the project root directory with the following content:
 ```
-GROK_API_KEY=your_api_key_here
+GROQ_API_KEY=your_api_key_here
+
+# Database Configuration (optional)
+DB_TYPE=sqlite  # Options: sqlite, mysql
 ```
-Note that there is a `.env.example` file in the py_backend_logic directory that you can use as a template.
+Note that there is a `.env.sample` file in the project root directory that you can use as a template.
+
+### Database Configuration
+The application supports two database backends:
+1. **SQLite** (default) - A file-based database that requires no additional setup
+2. **MySQL** - A more robust database system for production environments
+
+To configure the database, you can set the following environment variables in your `.env` file:
+```
+# Database Configuration
+# Options: sqlite, mysql
+DB_TYPE=sqlite
+
+# SQLite Configuration (used when DB_TYPE=sqlite)
+SQLITE_PATH=sqlite:///./cv_scanner.db
+
+# MySQL Configuration (used when DB_TYPE=mysql)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=cv_scanner
+```
+
+For more detailed information about the database system, please refer to the [Database Documentation](./py_backend_logic/DATABASE.md).
 
 You will also need to have Python 3.8 or higher installed on your system, as well as the required Python packages.
 - annotated-types==0.7.0
@@ -48,17 +75,29 @@ You will also need a web browser to access the frontend interface, and `node` an
 You can install `node` and `npm` from the official website: https://nodejs.org/
 
 ## Docker
-If you prefer to run the CV Quality Scanner in a Docker container, you can use the provided Dockerfile. To build the
-Docker image, run the following command in the root directory of the repository:
+If you prefer to run the CV Quality Scanner in Docker containers, you can use the provided docker-compose.yml file. 
+This will set up the backend, frontend, and optionally a MySQL database.
+
+### Running with Docker Compose
+To start all services, run the following command in the root directory of the repository:
 ```
-docker build -t cv-quality-scanner .
+docker-compose up -d
 ```
-To run the Docker container, use the following command:
+
+### Database Configuration with Docker
+The docker-compose.yml file includes configuration for both SQLite and MySQL databases:
+
+- **SQLite (Default)**: No additional configuration needed
+- **MySQL**: To use MySQL instead of SQLite, set the `DB_TYPE` environment variable to `mysql` in your `.env` file
+
+Example `.env` file for Docker with MySQL:
 ```
-docker run -d -p 8000:8000 -e GROK_API_KEY=your_api_key_here cv-quality-scanner
+GROQ_API_KEY=your_api_key_here
+DB_TYPE=mysql
+DB_PASSWORD=your_secure_password
 ```
-This will start the CV Quality Scanner on port 8000. You can access the frontend interface by opening your web browser and
-navigating to `http://localhost:8000`.
+
+This will start the CV Quality Scanner with the backend on port 8000 and the frontend on port 80. You can access the frontend interface by opening your web browser and navigating to `http://localhost`.
 
 ## Contributing
 If you want to contribute to the CV Quality Scanner, you can fork the repository and create a pull request. You can 

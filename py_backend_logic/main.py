@@ -1,5 +1,5 @@
 import json
-from fastapi import Request
+from fastapi import Request, Depends
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import os
@@ -8,9 +8,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import uvicorn
+from sqlalchemy.orm import Session
+
+# Import database module
+from database import init_db, get_session, get_db_type, CVDocument
 
 # Load the .env file
 load_dotenv()
+
+# Initialize database
+engine = init_db()
+print(f"Database initialized with type: {get_db_type()}")
 
 # Create FastAPI app
 app = FastAPI(title="CV Quality Scanner API")
@@ -70,6 +78,48 @@ def load_json(filename: str):
 def list_json_files():
     files = [f.name for f in DATA_DIR.glob("*.json")]
     return {"files": files}
+
+# Database API endpoints
+@app.get("/api/db/info")
+def get_db_info():
+    """Get information about the current database configuration"""
+    return {
+        "db_type": get_db_type(),
+        "status": "connected"
+    }
+
+@app.post("/api/db/documents")
+def create_document(filename: str, content: str, db: Session = Depends(get_session)):
+    """Create a new CV document in the database"""
+    doc = CVDocument(filename=filename, content=content)
+    db.add(doc)
+    db.commit()
+    db.refresh(doc)
+    return doc
+
+@app.get("/api/db/documents")
+def list_documents(db: Session = Depends(get_session)):
+    """List all CV documents in the database"""
+    docs = db.query(CVDocument).all()
+    return docs
+
+@app.get("/api/db/documents/{doc_id}")
+def get_document(doc_id: int, db: Session = Depends(get_session)):
+    """Get a specific CV document by ID"""
+    doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
+    if not doc:
+        return JSONResponse(status_code=404, content={"error": "Document not found"})
+    return doc
+
+@app.delete("/api/db/documents/{doc_id}")
+def delete_document(doc_id: int, db: Session = Depends(get_session)):
+    """Delete a CV document by ID"""
+    doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
+    if not doc:
+        return JSONResponse(status_code=404, content={"error": "Document not found"})
+    db.delete(doc)
+    db.commit()
+    return {"message": f"Document {doc_id} deleted"}
 
 # This allows the file to be run directly with python
 if __name__ == "__main__":
