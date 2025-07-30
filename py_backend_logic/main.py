@@ -12,6 +12,8 @@ from sqlalchemy.orm import Session
 
 # Import database module
 from database import init_db, get_session, get_db_type, CVDocument
+# Import API key manager
+from api_key_manager import GroqApiKeyManager
 
 # Load the .env file
 load_dotenv()
@@ -34,8 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Retrieve the API key
-api_key = os.getenv("GROQ_API_KEY")
+# Initialize the API key manager
+api_key_manager = GroqApiKeyManager()
+api_key = api_key_manager.get_api_key()
 
 # Create the Groq client
 client = Groq(api_key=api_key)
@@ -86,6 +89,25 @@ def get_db_info():
     return {
         "db_type": get_db_type(),
         "status": "connected"
+    }
+
+@app.get("/api/groq/status")
+def get_groq_api_status():
+    """Get the status of the GROQ API key"""
+    return {
+        "api_key_defined": api_key_manager.is_api_key_defined()
+    }
+
+@app.post("/api/groq/reload")
+def reload_groq_api_key():
+    """Reload the GROQ API key from environment variables"""
+    is_defined = api_key_manager.reload_api_key()
+    global api_key, client
+    api_key = api_key_manager.get_api_key()
+    client = Groq(api_key=api_key)
+    return {
+        "api_key_defined": is_defined,
+        "message": "GROQ API key reloaded and client updated"
     }
 
 @app.post("/api/db/documents")
