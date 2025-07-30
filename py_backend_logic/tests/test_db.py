@@ -7,6 +7,10 @@ This script tests both SQLite and MySQL database connections if configured.
 import os
 from dotenv import load_dotenv
 import sys
+from pathlib import Path
+
+# Add parent directory to path to import from parent directory
+sys.path.append(str(Path(__file__).parent.parent))
 from database import init_db, get_session, get_db_type, CVDocument
 
 def test_database():

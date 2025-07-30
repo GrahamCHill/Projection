@@ -1,6 +1,10 @@
 import os
-from api_key_manager import GroqApiKeyManager
+import sys
 from pathlib import Path
+
+# Add parent directory to path to import from parent directory
+sys.path.append(str(Path(__file__).parent.parent))
+from api_key_manager import GroqApiKeyManager
 
 def test_api_key_manager():
     """
