@@ -14,6 +14,20 @@ from sqlalchemy.orm import Session
 from database import init_db, get_session, get_db_type, CVDocument
 # Import API key manager
 from api_key_manager import GroqApiKeyManager
+# Import integration API
+try:
+    from integration_api import router as integration_router
+    INTEGRATION_AVAILABLE = True
+except ImportError:
+    INTEGRATION_AVAILABLE = False
+
+# Import GitHub API
+try:
+    from github_api import router as github_router
+    from github_scheduler import github_scheduler
+    GITHUB_AVAILABLE = True
+except ImportError:
+    GITHUB_AVAILABLE = False
 
 # Load the .env file
 load_dotenv()
@@ -42,6 +56,18 @@ api_key = api_key_manager.get_api_key()
 
 # Create the Groq client
 client = Groq(api_key=api_key)
+
+# Include integration router if available
+if INTEGRATION_AVAILABLE:
+    app.include_router(integration_router)
+    print("Integration API routes loaded")
+
+# Include GitHub router if available
+if GITHUB_AVAILABLE:
+    app.include_router(github_router)
+    # Start the GitHub polling scheduler
+    github_scheduler.start_polling()
+    print("GitHub API routes loaded and polling scheduler started")
 
 @app.get("/")
 async def root():

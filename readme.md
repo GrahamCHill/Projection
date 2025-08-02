@@ -42,11 +42,23 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=password
 DB_NAME=cv_scanner
+
+# S3 Storage Configuration
+S3_ENDPOINT=http://minio:9000
+S3_ACCESS_KEY=minioadmin
+S3_SECRET_KEY=minioadmin
+S3_BUCKET_NAME=cv-documents
+USE_MOCK_S3=true
+
+# Vector Database Configuration
+VECTOR_DB_URL=http://qdrant:6333
 ```
 
 For more detailed information about the database system, please refer to the [Database Documentation](./py_backend_logic/DATABASE.md).
 
 You will also need to have Python 3.8 or higher installed on your system, as well as the required Python packages.
+
+### Core Dependencies
 - annotated-types==0.7.0
 - anyio==4.9.0
 - certifi==2025.7.14
@@ -62,10 +74,21 @@ You will also need to have Python 3.8 or higher installed on your system, as wel
 - pydantic_core==2.33.2
 - python-dotenv==1.1.1
 - sniffio==1.3.1
+- sqlalchemy==2.0.27
+- pymysql==1.1.0
 - starlette==0.47.2
 - typing-inspection==0.4.1
 - typing_extensions==4.14.1
 - uvicorn==0.30.1
+
+### S3 Storage Dependencies
+- boto3==1.34.69
+- botocore==1.34.69
+- s3fs==2024.6.0
+
+### Vector Database Dependencies
+- numpy==1.26.4
+- qdrant-client==1.7.3
 You can install the required packages by running the following command in the `py_backend_logic` directory:
 ```
 pip install -r requirements.txt
@@ -84,20 +107,93 @@ To start all services, run the following command in the root directory of the re
 docker-compose up -d
 ```
 
-### Database Configuration with Docker
-The docker-compose.yml file includes configuration for both SQLite and MySQL databases:
+### Configuration with Docker
+The docker-compose.yml file includes configuration for several services:
 
+#### Database Configuration
 - **SQLite (Default)**: No additional configuration needed
 - **MySQL**: To use MySQL instead of SQLite, set the `DB_TYPE` environment variable to `mysql` in your `.env` file
 
-Example `.env` file for Docker with MySQL:
+#### S3-Compatible Storage
+The application includes a toggleable S3-compatible storage service using MinIO:
+- **Mock S3 (Default)**: Uses MinIO as a local S3-compatible storage
+- **Real S3**: Can be configured to use a real AWS S3 bucket by setting `USE_MOCK_S3=false` and providing your AWS credentials
+
+#### Vector Database
+The application includes a vector database service using Qdrant for storing and searching document embeddings.
+
+Example `.env` file for Docker with all services:
 ```
 GROQ_API_KEY=your_api_key_here
+
+# Database Configuration
 DB_TYPE=mysql
 DB_PASSWORD=your_secure_password
+
+# S3 Storage Configuration
+S3_ENDPOINT=http://minio:9000
+S3_ACCESS_KEY=minioadmin
+S3_SECRET_KEY=minioadmin
+S3_BUCKET_NAME=cv-documents
+USE_MOCK_S3=true
+
+# Vector Database Configuration
+VECTOR_DB_URL=http://qdrant:6333
 ```
 
 This will start the CV Quality Scanner with the backend on port 8000 and the frontend on port 80. You can access the frontend interface by opening your web browser and navigating to `http://localhost`.
+
+### Testing the Integration
+
+To test the integration of S3 storage and vector database, you can run the provided test script:
+
+```bash
+cd py_backend_logic
+python tests/test_integration.py
+```
+
+This script will:
+1. Check if all services are running correctly
+2. Test S3 storage operations (upload, list, download, delete)
+3. Test vector database operations (store, search, retrieve, delete)
+4. Test the integration API endpoints
+
+Make sure all Docker containers are running before executing the test script.
+
+## Integration API Endpoints
+
+The application provides several API endpoints for interacting with the S3 storage and vector database:
+
+### Status Endpoint
+- `GET /api/integration/status`: Get the status of the integration services
+
+### CV Document Operations
+- `POST /api/integration/upload-cv`: Upload a CV document, store it in S3, and create a vector embedding
+- `GET /api/integration/list-cvs`: List CV documents stored in the vector database
+- `GET /api/integration/get-cv/{document_id}`: Get a CV document by ID
+- `POST /api/integration/search-similar`: Search for similar CV documents based on a text query
+- `DELETE /api/integration/delete-cv/{document_id}`: Delete a CV document by ID
+
+### S3 Storage Toggle
+- `GET /api/integration/toggle-mock-s3`: Toggle between mock S3 and real S3 (for demonstration purposes)
+
+### Example Usage
+
+#### Uploading a CV
+```bash
+curl -X POST "http://localhost:8000/api/integration/upload-cv" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@/path/to/your/cv.pdf" \
+  -F "title=My CV" \
+  -F "description=Software Engineer CV"
+```
+
+#### Searching for Similar CVs
+```bash
+curl -X POST "http://localhost:8000/api/integration/search-similar" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "software engineer with python experience"}'
+```
 
 ## Contributing
 If you want to contribute to the CV Quality Scanner, you can fork the repository and create a pull request. You can 
