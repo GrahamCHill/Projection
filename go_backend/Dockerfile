@@ -1,29 +1,23 @@
-# Use an official Go runtime as a parent image
+# Dockerfile
 FROM golang:1.20-alpine
 
-# Install git and git-lfs
-RUN apk add --no-cache git git-lfs
+# Accept GOARCH as build argument
+ARG GOARCH
+ENV GOARCH=${GOARCH}
+ENV GOOS=linux
+ENV CGO_ENABLED=0
 
-# Initialize git-lfs
-RUN git lfs install
+# Install tools
+RUN apk add --no-cache git git-lfs && git lfs install
 
-# Set working directory
 WORKDIR /app
 
-# Copy go.mod and go.sum
 COPY go.mod ./
-
-# Copy the source code
 COPY . .
 
-# Build the Go app with CGO disabled for better compatibility
-ENV CGO_ENABLED=0
-# Build for the same architecture as the container
-ENV GOOS=linux
+# Build the binary
 RUN go build -o main .
 
-# Expose the port the app runs on
 EXPOSE 8001
 
-# Command to run the application
 CMD ["./main"]

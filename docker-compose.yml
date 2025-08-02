@@ -42,6 +42,8 @@ services:
     build:
       context: ./go_backend
       dockerfile: Dockerfile
+      args:
+        GOARCH: arm64
     container_name: cv_scanner_go_backend
     ports:
       - "8001:8001"
@@ -52,6 +54,7 @@ services:
     restart: unless-stopped
     networks:
       - cv_scanner_network
+
 
   frontend:
     build:
