@@ -23,6 +23,8 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME:-cv-documents}
       - USE_MOCK_S3=${USE_MOCK_S3:-true}
       - VECTOR_DB_URL=${VECTOR_DB_URL:-http://qdrant:6333}
+      - GO_BACKEND_URL=${GO_BACKEND_URL:-http://go_backend:8001}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
     volumes:
       - ./py_backend_logic:/app
     restart: unless-stopped
@@ -32,8 +34,24 @@ services:
       - mysql
       - minio
       - qdrant
+      - go_backend
     # Only when using MySQL
     # Comment out the depends_on if using SQLite
+    
+  go_backend:
+    build:
+      context: ./go_backend
+      dockerfile: Dockerfile
+    container_name: cv_scanner_go_backend
+    ports:
+      - "8001:8001"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      - ./go_backend:/app
+    restart: unless-stopped
+    networks:
+      - cv_scanner_network
 
   frontend:
     build:

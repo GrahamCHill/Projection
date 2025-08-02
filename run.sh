@@ -32,6 +32,16 @@ if ! command_exists python3; then
   exit 1
 fi
 
+# Check if Go is installed
+if command_exists go; then
+  GO_AVAILABLE=true
+  echo -e "${GREEN}Go is installed. Git LFS backend will be available.${NC}"
+else
+  GO_AVAILABLE=false
+  echo -e "${YELLOW}Go is not installed. Please install Go to run the Git LFS backend.${NC}"
+  echo -e "${YELLOW}Git LFS functionality will not be available.${NC}"
+fi
+
 # Start the backend server
 echo -e "${GREEN}Starting FastAPI backend server...${NC}"
 cd py_backend_logic
@@ -81,6 +91,25 @@ BACKEND_PID=$!
 # Go back to the root directory
 cd ..
 
+# Start the Go backend if available
+if [ "$GO_AVAILABLE" = true ]; then
+  echo -e "${GREEN}Starting Go Git LFS backend server...${NC}"
+  cd go_backend
+  
+  # Start the Go server in the background
+  echo -e "${GREEN}Starting Go Git LFS server on http://localhost:8001${NC}"
+  go run main.go &
+  GO_BACKEND_PID=$!
+  
+  # Go back to the root directory
+  cd ..
+  
+  # Set environment variable for Python backend to connect to Go backend
+  export GO_BACKEND_URL=http://localhost:8001
+else
+  echo -e "${YELLOW}Go is not available. Git LFS functionality will be disabled.${NC}"
+fi
+
 # Start the frontend
 echo -e "${GREEN}Starting React frontend...${NC}"
 cd react_frontend
@@ -100,7 +129,11 @@ cd ..
 # Function to handle script termination
 cleanup() {
   echo -e "${GREEN}Shutting down servers...${NC}"
-  kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+  if [ "$GO_AVAILABLE" = true ]; then
+    kill $BACKEND_PID $FRONTEND_PID $GO_BACKEND_PID 2>/dev/null
+  else
+    kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
+  fi
   exit 0
 }
 
@@ -110,6 +143,9 @@ trap cleanup SIGINT SIGTERM
 echo -e "${GREEN}=================================${NC}"
 echo -e "${GREEN}   Servers are now running!      ${NC}"
 echo -e "${GREEN}   Backend: http://localhost:8000${NC}"
+if [ "$GO_AVAILABLE" = true ]; then
+  echo -e "${GREEN}   Git LFS: http://localhost:8001${NC}"
+fi
 echo -e "${GREEN}   Frontend: http://localhost:5173${NC}"
 echo -e "${GREEN}   Press Ctrl+C to stop servers  ${NC}"
 echo -e "${GREEN}=================================${NC}"

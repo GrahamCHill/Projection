@@ -27,6 +27,15 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
+where go >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo %YELLOW%Go is not installed. Please install Go to run the Git LFS backend.%NC%
+    echo %YELLOW%Git LFS functionality will not be available.%NC%
+    set GO_AVAILABLE=false
+) else (
+    set GO_AVAILABLE=true
+)
+
 :: Start the backend server
 echo %GREEN%Starting FastAPI backend server...%NC%
 cd py_backend_logic
@@ -72,11 +81,29 @@ if %ERRORLEVEL% equ 0 (
 )
 
 :: Start the FastAPI server in a new window
-echo %GREEN%Starting FastAPI server on http://localhost:5000%NC%
+echo %GREEN%Starting FastAPI server on http://localhost:8000%NC%
 start "CV Quality Scanner Backend" cmd /c "python main.py"
 
 :: Go back to the root directory
 cd ..
+
+:: Start the Go backend if available
+if "%GO_AVAILABLE%"=="true" (
+    echo %GREEN%Starting Go Git LFS backend server...%NC%
+    cd go_backend
+    
+    :: Start the Go server in a new window
+    echo %GREEN%Starting Go Git LFS server on http://localhost:8001%NC%
+    start "CV Quality Scanner Git LFS Backend" cmd /c "go run main.go"
+    
+    :: Go back to the root directory
+    cd ..
+    
+    :: Set environment variable for Python backend to connect to Go backend
+    set GO_BACKEND_URL=http://localhost:8001
+) else (
+    echo %YELLOW%Go is not available. Git LFS functionality will be disabled.%NC%
+)
 
 :: Start the frontend
 echo %GREEN%Starting React frontend...%NC%
@@ -95,7 +122,10 @@ cd ..
 
 echo %GREEN%=================================%NC%
 echo %GREEN%   Servers are now running!      %NC%
-echo %GREEN%   Backend: http://localhost:5000%NC%
+echo %GREEN%   Backend: http://localhost:8000%NC%
+if "%GO_AVAILABLE%"=="true" (
+    echo %GREEN%   Git LFS: http://localhost:8001%NC%
+)
 echo %GREEN%   Frontend: http://localhost:5173%NC%
 echo %GREEN%   Close the server windows to stop%NC%
 echo %GREEN%=================================%NC%

@@ -6,6 +6,7 @@ from datetime import datetime
 
 from github_models import GitHubRepository, RepositoryTag, RepositoryProject
 from github_client import github_client
+from py_backend_logic.github_models import RepositoryProject, RepositoryTag
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -106,7 +107,7 @@ class GitHubRepositoryService:
         """
         return self.db.query(GitHubRepository).filter_by(full_name=full_name).first()
     
-    def list_repositories(self, skip: int = 0, limit: int = 100) -> List[GitHubRepository]:
+    def list_repositories(self, skip: int = 0, limit: int = 100) -> list[type[GitHubRepository]]:
         """
         List repositories with pagination
         
@@ -146,7 +147,8 @@ class GitHubRepositoryService:
             logger.error(f"Database error deleting repository: {str(e)}")
             raise
     
-    def create_tag(self, name: str, description: Optional[str] = None, color: str = "#CCCCCC") -> RepositoryTag:
+    def create_tag(self, name: str, description: Optional[str] = None, color: str = "#CCCCCC") -> Union[
+        type[RepositoryTag], RepositoryTag]:
         """
         Create a new tag
         
@@ -215,7 +217,7 @@ class GitHubRepositoryService:
         """
         return self.db.query(RepositoryTag).filter_by(name=name).first()
     
-    def list_tags(self) -> List[RepositoryTag]:
+    def list_tags(self) -> list[type[RepositoryTag]]:
         """
         List all tags
         
@@ -249,7 +251,8 @@ class GitHubRepositoryService:
             logger.error(f"Database error deleting tag: {str(e)}")
             raise
     
-    def create_project(self, name: str, description: Optional[str] = None) -> RepositoryProject:
+    def create_project(self, name: str, description: Optional[str] = None) -> Union[
+        type[RepositoryProject], RepositoryProject]:
         """
         Create a new project
         
@@ -258,10 +261,10 @@ class GitHubRepositoryService:
             description: Project description
             
         Returns:
-            Created project object
+            Created a project object
         """
         try:
-            # Check if project already exists
+            # Check if a project already exists
             existing_project = self.db.query(RepositoryProject).filter_by(name=name).first()
             
             if existing_project:
@@ -273,7 +276,7 @@ class GitHubRepositoryService:
                 logger.info(f"Updated project: {existing_project.name}")
                 return existing_project
             
-            # Create new project
+            # Create a new project
             new_project = RepositoryProject(
                 name=name,
                 description=description
@@ -303,7 +306,7 @@ class GitHubRepositoryService:
         """
         return self.db.query(RepositoryProject).filter_by(id=project_id).first()
     
-    def list_projects(self) -> List[RepositoryProject]:
+    def list_projects(self) -> list[type[RepositoryProject]]:
         """
         List all projects
         

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 import requests
 import logging
 import os
@@ -14,22 +14,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Create router
-router = APIRouter(prefix="/api/github", tags=["github"])
+router = APIRouter(prefix="/api/git-lfs", tags=["git-lfs"])
 
 # Configuration
 GO_BACKEND_URL = os.getenv("GO_BACKEND_URL", "http://localhost:8001")
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 
 # Models
-class GitHubRequest(BaseModel):
+class GitLFSRequest(BaseModel):
     operation: str
     repo_path: str
-    github_owner: Optional[str] = None
-    github_repo: Optional[str] = None
-    branch: Optional[str] = None
     file_path: Optional[str] = None
+    url: Optional[str] = None
 
-class GitHubResponse(BaseModel):
+class GitLFSResponse(BaseModel):
     success: bool
     message: str
     data: Optional[Any] = None
@@ -42,7 +39,7 @@ def call_go_backend(request_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     try:
         response = requests.post(
-            f"{GO_BACKEND_URL}/api/github",
+            f"{GO_BACKEND_URL}/api/git-lfs",
             json=request_data,
             timeout=30  # 30 seconds timeout
         )
@@ -52,91 +49,83 @@ def call_go_backend(request_data: Dict[str, Any]) -> Dict[str, Any]:
         logger.error(f"Error calling Go backend: {str(e)}")
         raise HTTPException(
             status_code=503,
-            detail=f"Failed to communicate with GitHub service: {str(e)}"
+            detail=f"Failed to communicate with Git LFS service: {str(e)}"
         )
 
 @router.get("/status")
 async def get_status():
     """
-    Check the status of the GitHub integration.
+    Check the status of the Git LFS Go backend service.
     """
     try:
         response = requests.get(f"{GO_BACKEND_URL}/health", timeout=5)
         response.raise_for_status()
-        
-        # Check if GitHub token is configured
-        token_configured = GITHUB_TOKEN != ""
-        
         return {
             "status": "available",
             "go_backend_url": GO_BACKEND_URL,
-            "github_token_configured": token_configured,
-            "message": "GitHub integration is available"
+            "message": response.json().get("message", "Git LFS backend is running")
         }
     except requests.RequestException as e:
-        logger.error(f"Error checking GitHub service status: {str(e)}")
+        logger.error(f"Error checking Git LFS service status: {str(e)}")
         return {
             "status": "unavailable",
             "go_backend_url": GO_BACKEND_URL,
-            "github_token_configured": GITHUB_TOKEN != "",
             "error": str(e)
         }
 
-@router.post("/clone")
-async def clone_repository(request: GitHubRequest):
+@router.post("/init")
+async def init_git_lfs(request: GitLFSRequest):
     """
-    Clone a GitHub repository.
+    Initialize Git LFS in a repository.
     """
-    if not request.github_owner or not request.github_repo or not request.repo_path:
-        raise HTTPException(status_code=400, detail="GitHub owner, repository name, and local path are required")
-    
     request_data = {
-        "operation": "clone",
-        "repo_path": request.repo_path,
-        "github_owner": request.github_owner,
-        "github_repo": request.github_repo,
-        "branch": request.branch
+        "operation": "init",
+        "repo_path": request.repo_path
     }
     return call_go_backend(request_data)
 
-@router.post("/pull")
-async def pull_repository(request: GitHubRequest):
+@router.post("/track")
+async def track_files(request: GitLFSRequest):
     """
-    Pull changes from a GitHub repository.
+    Track files with Git LFS.
     """
-    if not request.repo_path:
-        raise HTTPException(status_code=400, detail="Repository path is required")
+    if not request.file_path:
+        raise HTTPException(status_code=400, detail="file_path is required")
     
     request_data = {
-        "operation": "pull",
+        "operation": "track",
         "repo_path": request.repo_path,
-        "branch": request.branch
+        "file_path": request.file_path
     }
     return call_go_backend(request_data)
 
 @router.post("/push")
-async def push_repository(request: GitHubRequest):
+async def push_lfs_objects(request: GitLFSRequest):
     """
-    Push changes to a GitHub repository.
+    Push Git LFS objects to the remote repository.
     """
-    if not request.repo_path:
-        raise HTTPException(status_code=400, detail="Repository path is required")
-    
     request_data = {
         "operation": "push",
-        "repo_path": request.repo_path,
-        "branch": request.branch
+        "repo_path": request.repo_path
+    }
+    return call_go_backend(request_data)
+
+@router.post("/pull")
+async def pull_lfs_objects(request: GitLFSRequest):
+    """
+    Pull Git LFS objects from the remote repository.
+    """
+    request_data = {
+        "operation": "pull",
+        "repo_path": request.repo_path
     }
     return call_go_backend(request_data)
 
 @router.post("/status")
-async def get_repository_status(request: GitHubRequest):
+async def get_lfs_status(request: GitLFSRequest):
     """
-    Get the status of a GitHub repository.
+    Get the status of Git LFS files in the repository.
     """
-    if not request.repo_path:
-        raise HTTPException(status_code=400, detail="Repository path is required")
-    
     request_data = {
         "operation": "status",
         "repo_path": request.repo_path

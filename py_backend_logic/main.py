@@ -24,10 +24,23 @@ except ImportError:
 # Import GitHub API
 try:
     from github_api import router as github_router
-    from github_scheduler import github_scheduler
     GITHUB_AVAILABLE = True
+    # Try to import scheduler if available
+    try:
+        from github_scheduler import github_scheduler
+        GITHUB_SCHEDULER_AVAILABLE = True
+    except ImportError:
+        GITHUB_SCHEDULER_AVAILABLE = False
 except ImportError:
     GITHUB_AVAILABLE = False
+    GITHUB_SCHEDULER_AVAILABLE = False
+
+# Import Git LFS API
+try:
+    from git_lfs_api import router as git_lfs_router
+    GIT_LFS_AVAILABLE = True
+except ImportError:
+    GIT_LFS_AVAILABLE = False
 
 # Load the .env file
 load_dotenv()
@@ -65,9 +78,17 @@ if INTEGRATION_AVAILABLE:
 # Include GitHub router if available
 if GITHUB_AVAILABLE:
     app.include_router(github_router)
-    # Start the GitHub polling scheduler
-    github_scheduler.start_polling()
-    print("GitHub API routes loaded and polling scheduler started")
+    print("GitHub API routes loaded")
+    
+    # Start the GitHub polling scheduler if available
+    if GITHUB_SCHEDULER_AVAILABLE:
+        github_scheduler.start_polling()
+        print("GitHub polling scheduler started")
+
+# Include Git LFS router if available
+if GIT_LFS_AVAILABLE:
+    app.include_router(git_lfs_router)
+    print("Git LFS API routes loaded")
 
 @app.get("/")
 async def root():
