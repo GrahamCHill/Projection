@@ -123,7 +123,8 @@ The docker-compose.yml file includes configuration for several services:
 
 #### S3-Compatible Storage
 The application includes a toggleable S3-compatible storage service using MinIO:
-- **Mock S3 (Default)**: Uses MinIO as a local S3-compatible storage
+- **Mock S3 (Default)**: Uses MinIO as a local S3-compatible storage (use username and password `minioadmin` if using 
+default configuration.)
 - **Real S3**: Can be configured to use a real AWS S3 bucket by setting `USE_MOCK_S3=false` and providing your AWS credentials
 
 #### Vector Database
