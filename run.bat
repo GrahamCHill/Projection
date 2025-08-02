@@ -44,6 +44,33 @@ call .venv\Scripts\activate.bat
 echo %GREEN%Installing/updating Python dependencies...%NC%
 pip install -r requirements.txt
 
+:: Check for MinIO client (for S3 storage)
+where mc >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    echo %GREEN%MinIO client found. S3 storage will be available.%NC%
+) else (
+    echo %YELLOW%MinIO client not found. S3 storage features may not work properly.%NC%
+    echo %YELLOW%Install MinIO client for full S3 functionality: https://min.io/docs/minio/windows/reference/minio-mc.html%NC%
+)
+
+:: Check if Qdrant client dependencies are installed
+python -c "import qdrant_client" >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    echo %GREEN%Qdrant client found. Vector database will be available.%NC%
+) else (
+    echo %YELLOW%Qdrant client not found. Vector database features may not work properly.%NC%
+    echo %YELLOW%Install Qdrant client for full vector database functionality: pip install qdrant-client%NC%
+)
+
+:: Check if GitHub API dependencies are installed
+python -c "import requests" >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    echo %GREEN%GitHub API dependencies found. GitHub integration will be available.%NC%
+) else (
+    echo %YELLOW%GitHub API dependencies not found. GitHub integration may not work properly.%NC%
+    echo %YELLOW%Install requests for full GitHub functionality: pip install requests%NC%
+)
+
 :: Start the FastAPI server in a new window
 echo %GREEN%Starting FastAPI server on http://localhost:5000%NC%
 start "CV Quality Scanner Backend" cmd /c "python main.py"

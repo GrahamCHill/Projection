@@ -49,6 +49,30 @@ source .venv/bin/activate
 echo -e "${GREEN}Installing/updating Python dependencies...${NC}"
 pip install -r requirements.txt
 
+# Check if MinIO client is installed (for S3 storage)
+if command_exists mc; then
+  echo -e "${GREEN}MinIO client found. S3 storage will be available.${NC}"
+else
+  echo -e "${YELLOW}MinIO client not found. S3 storage features may not work properly.${NC}"
+  echo -e "${YELLOW}Install MinIO client for full S3 functionality: https://min.io/docs/minio/linux/reference/minio-mc.html${NC}"
+fi
+
+# Check if Qdrant client dependencies are installed
+if python3 -c "import qdrant_client" &>/dev/null; then
+  echo -e "${GREEN}Qdrant client found. Vector database will be available.${NC}"
+else
+  echo -e "${YELLOW}Qdrant client not found. Vector database features may not work properly.${NC}"
+  echo -e "${YELLOW}Install Qdrant client for full vector database functionality: pip install qdrant-client${NC}"
+fi
+
+# Check if GitHub API dependencies are installed
+if python3 -c "import requests" &>/dev/null; then
+  echo -e "${GREEN}GitHub API dependencies found. GitHub integration will be available.${NC}"
+else
+  echo -e "${YELLOW}GitHub API dependencies not found. GitHub integration may not work properly.${NC}"
+  echo -e "${YELLOW}Install requests for full GitHub functionality: pip install requests${NC}"
+fi
+
 # Start the FastAPI server in the background
 echo -e "${GREEN}Starting FastAPI server on http://localhost:8000${NC}"
 python main.py &
