@@ -107,7 +107,7 @@ if __name__ == "__main__":
     # Load environment variables
     load_dotenv()
     
-    print("CV Quality Scanner Database Test")
+    print("Projection Database Test")
     print("================================")
     
     # Test SQLite by default

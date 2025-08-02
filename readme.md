@@ -127,9 +127,16 @@ The Go backend is configured to build correctly on different platforms (ARM64, x
    GOARCH=amd64 docker-compose up -d
    ```
 
-3. Use the provided helper script that automatically detects your system architecture:
+3. Use the provided helper scripts that automatically detect your system architecture:
+   
+   For Linux/macOS:
    ```
-   ./set-arch.sh docker-compose up -d
+   ./run-docker-cross-platform.sh
+   ```
+   
+   For Windows:
+   ```
+   run-docker-cross-platform.bat
    ```
 
 This ensures the Go application builds correctly regardless of the host platform.
@@ -169,7 +176,7 @@ USE_MOCK_S3=true
 VECTOR_DB_URL=http://qdrant:6333
 ```
 
-This will start the CV Quality Scanner with the backend on port 8000 and the frontend on port 80. You can access the frontend interface by opening your web browser and navigating to `http://localhost`.
+This will start the Projection with the backend on port 8000 and the frontend on port 80. You can access the frontend interface by opening your web browser and navigating to `http://localhost`.
 
 ### Testing the Integration
 
@@ -306,11 +313,11 @@ curl -X POST "http://localhost:8000/api/integration/search-similar" \
 ```
 
 ## Contributing
-If you want to contribute to the CV Quality Scanner, you can fork the repository and create a pull request. You can 
+If you want to contribute to the Projection, you can fork the repository and create a pull request. You can 
 also report issues or suggest features by opening an issue in the repository.
 
 ## License
-The CV Quality Scanner is licensed under the GNU Lesser General Public License (LGPL) v3.0. See the LICENSE file for more details.
+The Projection is licensed under the GNU Lesser General Public License (LGPL) v3.0. See the LICENSE file for more details.
 
 ### Acknowledgements
 This project is inspired by a project created by my one of my superiors at work, who used it to scan CVs for quality

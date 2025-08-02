@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: CV Quality Scanner - Docker Run Script for Windows
+:: Projection - Docker Run Script for Windows
 :: This script starts the application using Docker Compose
 
 :: Define colors for output
@@ -11,7 +11,7 @@ set "NC=[0m"
 
 :: Print banner
 echo %GREEN%=================================%NC%
-echo %GREEN%   CV Quality Scanner Docker    %NC%
+echo %GREEN%        Projection Docker        %NC%
 echo %GREEN%=================================%NC%
 
 :: Check for required commands

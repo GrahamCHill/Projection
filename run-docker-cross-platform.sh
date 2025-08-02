@@ -6,7 +6,7 @@ source ./set-arch.sh
 
 # Print banner
 echo "====================================="
-echo "CV Quality Scanner - Cross-Platform"
+echo "Projection - Cross-Platform"
 echo "====================================="
 echo "Detected architecture: $ARCH"
 echo "Using GOARCH=$GOARCH"

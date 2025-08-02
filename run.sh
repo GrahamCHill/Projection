@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# CV Quality Scanner - Run Script
+# Projection - Run Script
 # This script starts both the FastAPI backend and React frontend
 
 # Set error handling
@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 # Print banner
 echo -e "${GREEN}=================================${NC}"
-echo -e "${GREEN}   CV Quality Scanner Startup   ${NC}"
+echo -e "${GREEN}        Projection Docker        ${NC}"
 echo -e "${GREEN}=================================${NC}"
 
 # Function to check if a command exists

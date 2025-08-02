@@ -1,15 +1,15 @@
 # Git and GitHub Integration
 
-This document describes the Git, GitHub, and Git LFS (Large File Storage) integration for the CV Quality Scanner application.
+This document describes the Git, GitHub, and Git LFS (Large File Storage) integration for the Projection application.
 
 ## Overview
 
-The CV Quality Scanner now includes Git and GitHub support through a dedicated Golang backend service. This service handles Git operations such as cloning, pulling, and pushing repositories, as well as Git LFS operations such as initialization, tracking files, and managing LFS objects.
+The Projection now includes Git and GitHub support through a dedicated Golang backend service. This service handles Git operations such as cloning, pulling, and pushing repositories, as well as Git LFS operations such as initialization, tracking files, and managing LFS objects.
 
 The architecture consists of:
 1. A Golang backend service that interfaces directly with Git and Git LFS
 2. A Python FastAPI module that communicates with the Golang service
-3. Integration with the existing CV Quality Scanner application
+3. Integration with the existing Projection application
 4. Support for GitHub repositories with authentication
 
 ## Requirements
@@ -142,7 +142,7 @@ print(response.json())
 
 ## GitHub Integration
 
-The CV Quality Scanner now includes GitHub integration for working with repositories directly. This integration uses the same Golang backend service and provides the following features:
+The Projection now includes GitHub integration for working with repositories directly. This integration uses the same Golang backend service and provides the following features:
 
 - Clone GitHub repositories
 - Pull changes from GitHub repositories
@@ -210,7 +210,7 @@ print(response.json())
 
 ## Docker Integration
 
-The CV Quality Scanner now includes Docker support for both the Python backend and the Golang backend. The Docker setup includes:
+The Projection now includes Docker support for both the Python backend and the Golang backend. The Docker setup includes:
 
 - A Python backend container with Git and GitHub CLI
 - A Golang backend container with Git and Git LFS

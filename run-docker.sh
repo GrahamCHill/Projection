@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# CV Quality Scanner - Docker Run Script
+# Projection - Docker Run Script
 # This script starts the application using Docker Compose
 
 # Set error handling
@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 # Print banner
 echo -e "${GREEN}=================================${NC}"
-echo -e "${GREEN}   CV Quality Scanner Docker    ${NC}"
+echo -e "${GREEN}        Projection Docker        ${NC}"
 echo -e "${GREEN}=================================${NC}"
 
 # Function to check if a command exists

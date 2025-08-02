@@ -1,6 +1,6 @@
 # Database System Documentation
 
-This document provides information about the database system implemented in the CV Quality Scanner application.
+This document provides information about the database system implemented in the Projection application.
 
 ## Overview
 

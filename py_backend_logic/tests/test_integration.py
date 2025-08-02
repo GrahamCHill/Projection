@@ -169,7 +169,7 @@ def test_integration_api():
 
 if __name__ == "__main__":
     print("=== Integration Test Script ===")
-    print("This script tests the integration of S3 storage and vector database with the CV Quality Scanner.")
+    print("This script tests the integration of S3 storage and vector database with the Projection.")
     print("Make sure the Docker containers are running before executing this script.")
     
     # Wait a moment to ensure services are fully started

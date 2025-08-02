@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: CV Quality Scanner - Run Script for Windows
+:: Projection - Run Script for Windows
 :: This script starts both the FastAPI backend and React frontend
 
 :: Define colors for output
@@ -11,7 +11,7 @@ set "NC=[0m"
 
 :: Print banner
 echo %GREEN%=================================%NC%
-echo %GREEN%   CV Quality Scanner Startup   %NC%
+echo %GREEN%   Projection Startup   %NC%
 echo %GREEN%=================================%NC%
 
 :: Check for required commands
@@ -82,7 +82,7 @@ if %ERRORLEVEL% equ 0 (
 
 :: Start the FastAPI server in a new window
 echo %GREEN%Starting FastAPI server on http://localhost:8000%NC%
-start "CV Quality Scanner Backend" cmd /c "python main.py"
+start "Projection Backend" cmd /c "python main.py"
 
 :: Go back to the root directory
 cd ..
@@ -94,7 +94,7 @@ if "%GO_AVAILABLE%"=="true" (
     
     :: Start the Go server in a new window
     echo %GREEN%Starting Go Git LFS server on http://localhost:8001%NC%
-    start "CV Quality Scanner Git LFS Backend" cmd /c "go run main.go"
+    start "Projection Git LFS Backend" cmd /c "go run main.go"
     
     :: Go back to the root directory
     cd ..
@@ -115,7 +115,7 @@ call npm install
 
 :: Start the React development server in a new window
 echo %GREEN%Starting React development server on http://localhost:5173%NC%
-start "CV Quality Scanner Frontend" cmd /c "npm run dev"
+start "Projection Frontend" cmd /c "npm run dev"
 
 :: Go back to the root directory
 cd ..
