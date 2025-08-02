@@ -52,6 +52,13 @@ USE_MOCK_S3=true
 
 # Vector Database Configuration
 VECTOR_DB_URL=http://qdrant:6333
+
+# GitHub Configuration
+GITHUB_TOKEN=your_github_token_here
+GITHUB_ENTERPRISE_URL=
+GITHUB_POLLING_INTERVAL=600
+GITHUB_USERS=username1,username2
+GITHUB_ORGANIZATIONS=org1,org2
 ```
 
 For more detailed information about the database system, please refer to the [Database Documentation](./py_backend_logic/DATABASE.md).
@@ -177,7 +184,89 @@ The application provides several API endpoints for interacting with the S3 stora
 ### S3 Storage Toggle
 - `GET /api/integration/toggle-mock-s3`: Toggle between mock S3 and real S3 (for demonstration purposes)
 
-### Example Usage
+## GitHub Repository Management
+
+The application includes a GitHub repository management system that allows you to:
+1. Poll GitHub repositories (personal or enterprise) at regular intervals
+2. Store repository information in the database
+3. Tag repositories and organize them into projects
+4. Search and filter repositories
+
+### Configuration
+
+To use the GitHub repository management features, you need to configure the following environment variables:
+
+```
+# GitHub Configuration
+# Personal access token with repo scope
+GITHUB_TOKEN=your_github_token_here
+# GitHub Enterprise URL (leave empty for github.com)
+GITHUB_ENTERPRISE_URL=
+# Polling interval in seconds (default: 600 = 10 minutes)
+GITHUB_POLLING_INTERVAL=600
+# Comma-separated list of GitHub usernames to monitor
+GITHUB_USERS=username1,username2
+# Comma-separated list of GitHub organizations to monitor
+GITHUB_ORGANIZATIONS=org1,org2
+```
+
+### GitHub API Endpoints
+
+#### Repository Management
+- `GET /api/github/repositories`: List all repositories
+- `GET /api/github/repositories/{repo_id}`: Get a repository by ID
+- `DELETE /api/github/repositories/{repo_id}`: Delete a repository by ID
+
+#### Tag Management
+- `GET /api/github/tags`: List all tags
+- `POST /api/github/tags`: Create a new tag
+- `GET /api/github/tags/{tag_id}`: Get a tag by ID
+- `DELETE /api/github/tags/{tag_id}`: Delete a tag by ID
+- `POST /api/github/repositories/{repo_id}/tags/{tag_id}`: Add a tag to a repository
+- `DELETE /api/github/repositories/{repo_id}/tags/{tag_id}`: Remove a tag from a repository
+
+#### Project Management
+- `GET /api/github/projects`: List all projects
+- `POST /api/github/projects`: Create a new project
+- `GET /api/github/projects/{project_id}`: Get a project by ID
+- `DELETE /api/github/projects/{project_id}`: Delete a project by ID
+- `POST /api/github/repositories/{repo_id}/projects/{project_id}`: Add a repository to a project
+- `DELETE /api/github/repositories/{repo_id}/projects/{project_id}`: Remove a repository from a project
+
+#### Polling Control
+- `GET /api/github/polling/status`: Get the status of the GitHub polling scheduler
+- `POST /api/github/polling/start`: Start the GitHub polling scheduler
+- `POST /api/github/polling/stop`: Stop the GitHub polling scheduler
+- `POST /api/github/polling/poll-now`: Trigger an immediate poll of GitHub repositories
+- `POST /api/github/polling/poll-user/{username}`: Poll repositories for a specific user
+- `POST /api/github/polling/poll-organization/{org_name}`: Poll repositories for a specific organization
+- `GET /api/github/rate-limit`: Get GitHub API rate limit information
+
+### Example Usage for GitHub API
+
+#### Creating a Tag
+```bash
+curl -X POST "http://localhost:8000/api/github/tags" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Frontend", "description": "Frontend repositories", "color": "#FF5733"}'
+```
+
+#### Adding a Repository to a Project
+```bash
+curl -X POST "http://localhost:8000/api/github/repositories/1/projects/1"
+```
+
+#### Polling Repositories for a Specific User
+```bash
+curl -X POST "http://localhost:8000/api/github/polling/poll-user/username"
+```
+
+#### Getting Polling Status
+```bash
+curl -X GET "http://localhost:8000/api/github/polling/status"
+```
+
+### Example Usage for Integration API
 
 #### Uploading a CV
 ```bash
