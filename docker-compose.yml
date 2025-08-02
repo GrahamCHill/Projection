@@ -5,22 +5,22 @@ services:
     build:
       context: ./py_backend_logic
       dockerfile: Dockerfile
-    container_name: cv_scanner_backend
+    container_name: projection_backend
     ports:
       - "8000:8000"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
       - DB_TYPE=${DB_TYPE:-sqlite}
-      - SQLITE_PATH=${SQLITE_PATH:-sqlite:///./cv_scanner.db}
+      - SQLITE_PATH=${SQLITE_PATH:-sqlite:///./projection.db}
       - DB_HOST=${DB_HOST:-mysql}
       - DB_PORT=${DB_PORT:-3306}
       - DB_USER=${DB_USER:-root}
       - DB_PASSWORD=${DB_PASSWORD:-password}
-      - DB_NAME=${DB_NAME:-cv_scanner}
+      - DB_NAME=${DB_NAME:-projection}
       - S3_ENDPOINT=${S3_ENDPOINT:-http://minio:9000}
       - S3_ACCESS_KEY=${S3_ACCESS_KEY:-minioadmin}
       - S3_SECRET_KEY=${S3_SECRET_KEY:-minioadmin}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-cv-documents}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-projection-documents}
       - USE_MOCK_S3=${USE_MOCK_S3:-true}
       - VECTOR_DB_URL=${VECTOR_DB_URL:-http://qdrant:6333}
       - GO_BACKEND_URL=${GO_BACKEND_URL:-http://go_backend:8001}
@@ -29,7 +29,7 @@ services:
       - ./py_backend_logic:/app
     restart: unless-stopped
     networks:
-      - cv_scanner_network
+      - projection_network
     depends_on:
       - mysql
       - minio
@@ -43,53 +43,56 @@ services:
       context: ./go_backend
       dockerfile: Dockerfile
       args:
-        GOARCH: arm64
-    container_name: cv_scanner_go_backend
+        # Can be overridden with GOARCH environment variable
+        # Docker Compose doesn't support shell commands directly, so we use environment variables
+        GOARCH: ${GOARCH}
+    container_name: projection_go_backend
     ports:
       - "8001:8001"
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN:-}
-    volumes:
-      - ./go_backend:/app
+    # Removed volume mount that was overwriting the built binary
+    # volumes:
+    #   - ./go_backend:/app
     restart: unless-stopped
     networks:
-      - cv_scanner_network
+      - projection_network
 
 
   frontend:
     build:
       context: ./react_frontend
       dockerfile: Dockerfile
-    container_name: cv_scanner_frontend
+    container_name: projection_frontend
     ports:
       - "80:80"
     depends_on:
       - backend
     restart: unless-stopped
     networks:
-      - cv_scanner_network
+      - projection_network
 
   # MySQL service (only used when DB_TYPE=mysql)
   mysql:
     image: mysql:8.0
-    container_name: cv_scanner_mysql
+    container_name: projection_mysql
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-password}
-      - MYSQL_DATABASE=${DB_NAME:-cv_scanner}
+      - MYSQL_DATABASE=${DB_NAME:-projection}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - cv_scanner_network
+      - projection_network
     # To disable MySQL when using SQLite, you can comment out this service
     # or set the profile to "mysql" and only enable it when needed
 
   # MinIO service (S3-compatible storage)
   minio:
     image: minio/minio:latest
-    container_name: cv_scanner_minio
+    container_name: projection_minio
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -100,7 +103,7 @@ services:
       - minio_data:/data
     command: server /data --console-address ":9001"
     networks:
-      - cv_scanner_network
+      - projection_network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -110,14 +113,14 @@ services:
   # Qdrant vector database
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: cv_scanner_qdrant
+    container_name: projection_qdrant
     ports:
       - "6333:6333"
       - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
-      - cv_scanner_network
+      - projection_network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
       interval: 30s
@@ -125,7 +128,7 @@ services:
       retries: 3
 
 networks:
-  cv_scanner_network:
+  projection_network:
     driver: bridge
 
 volumes:

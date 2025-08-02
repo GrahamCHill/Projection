@@ -7,7 +7,7 @@ const Header: React.FC = () => {
         <>
             {/* Header with Main site title and menu */}
             <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
-                <h1 className="text-xl font-bold"><Link to="/"> My React App</Link></h1>
+                <h1 className="text-xl font-bold"><Link to="/"> Projection</Link></h1>
             </header>
             <MenuComponent />
         </>

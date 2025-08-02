@@ -1,4 +1,4 @@
-# CV Quality Scanner
+# Projection
 ## About
 This is a simple tool to scan CVs for quality and compliance with best practices. It checks for common issues such as 
 missing sections, formatting problems, and readability. It is designed to help job seekers improve their CVs and 
@@ -6,12 +6,12 @@ increase their chances of getting hired. It can also be used by recruiters to qu
 companies to ensure that applicant CVs are compliant with their standards.
 
 ## Usage
-To use the CV Quality Scanner, you can run the shell or batch script provided in the repository. The script will load a
+To use Projection, you can run the shell or batch script provided in the repository. The script will load a
 frontend interface that allows you to upload a CV file and scan it for quality issues. The script will also provide
 feedback on how to improve the CV and increase its chances of getting hired.
 
 ## Requirements
-The CV Quality Scanner requires that you have signed up for an account with Groq (or another AI provider) and have
+Projection requires that you have signed up for an account with Groq (or another AI provider) and have
 obtained an API key. You will need to set the `GROQ_API_KEY` environment variable to your API key before running
 the script. You can do this by creating a `.env` file in the project root directory with the following content:
 ```
@@ -105,7 +105,7 @@ You will also need a web browser to access the frontend interface, and `node` an
 You can install `node` and `npm` from the official website: https://nodejs.org/
 
 ## Docker
-If you prefer to run the CV Quality Scanner in Docker containers, you can use the provided docker-compose.yml file. 
+If you prefer to run the Projection in Docker containers, you can use the provided docker-compose.yml file. 
 This will set up the backend, frontend, and optionally a MySQL database.
 
 ### Running with Docker Compose
@@ -113,6 +113,26 @@ To start all services, run the following command in the root directory of the re
 ```
 docker-compose up -d
 ```
+
+#### Cross-Platform Support
+The Go backend is configured to build correctly on different platforms (ARM64, x86_64/AMD64). You can:
+
+1. Let Docker automatically detect the architecture:
+   ```
+   docker-compose up -d
+   ```
+
+2. Explicitly set the architecture using the GOARCH environment variable:
+   ```
+   GOARCH=amd64 docker-compose up -d
+   ```
+
+3. Use the provided helper script that automatically detects your system architecture:
+   ```
+   ./set-arch.sh docker-compose up -d
+   ```
+
+This ensures the Go application builds correctly regardless of the host platform.
 
 ### Configuration with Docker
 The docker-compose.yml file includes configuration for several services:

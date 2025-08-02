@@ -14,8 +14,8 @@ DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "3306")
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-DB_NAME = os.getenv("DB_NAME", "cv_scanner")
-SQLITE_PATH = os.getenv("SQLITE_PATH", "sqlite:///./cv_scanner.db")
+DB_NAME = os.getenv("DB_NAME", "projection")
+SQLITE_PATH = os.getenv("SQLITE_PATH", "sqlite:///./projection.db")
 
 # Create the SQLAlchemy Base
 Base = declarative_base()

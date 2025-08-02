@@ -50,7 +50,7 @@ engine = init_db()
 print(f"Database initialized with type: {get_db_type()}")
 
 # Create FastAPI app
-app = FastAPI(title="CV Quality Scanner API")
+app = FastAPI(title="Projection API")
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(exist_ok=True)
 
@@ -92,7 +92,7 @@ if GIT_LFS_AVAILABLE:
 
 @app.get("/")
 async def root():
-    return {"message": "CV Quality Scanner API is running"}
+    return {"message": "Projection API is running"}
 
 @app.get("/api/test")
 async def test_groq():
