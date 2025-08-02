@@ -104,7 +104,7 @@ If you want to contribute to the CV Quality Scanner, you can fork the repository
 also report issues or suggest features by opening an issue in the repository.
 
 ## License
-The CV Quality Scanner is licensed under the MIT License. See the LICENSE file for more details.
+The CV Quality Scanner is licensed under the GNU Lesser General Public License (LGPL) v3.0. See the LICENSE file for more details.
 
 ### Acknowledgements
 This project is inspired by a project created by my one of my superiors at work, who used it to scan CVs for quality
