@@ -8,3 +8,4 @@ node_modules/set-cookie-parser/
 /node_modules
 *.db
 py_backend_logic/groq_api_status.txt
+go_backend/main

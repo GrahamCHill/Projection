@@ -16,7 +16,10 @@ COPY go.mod ./
 # Copy the source code
 COPY . .
 
-# Build the Go app
+# Build the Go app with CGO disabled for better compatibility
+ENV CGO_ENABLED=0
+# Build for the same architecture as the container
+ENV GOOS=linux
 RUN go build -o main .
 
 # Expose the port the app runs on
