@@ -8,7 +8,7 @@ You grant the project maintainer (Graham Christopher Hill) a perpetual, worldwid
 royalty-free, and irrevocable license to use, modify, distribute, and sublicense your contributions under any license 
 of the maintainer's choosing.
 
-Contributers, who contribute large amounts of code, may be entitled to a share of the project's revenue,
+Contributors, who contribute large amounts of code, may be entitled to a share of the project's revenue,
 if the maintainer decides to monetize the project.
 
 ### Original License Retention
