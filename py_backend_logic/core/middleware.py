@@ -5,7 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 from typing import Callable, Optional
 
-from logging_manager import logging_manager, get_logger
+from core.logging_manager import logging_manager, get_logger
 
 # Create a logger for the middleware
 logger = get_logger("middleware")

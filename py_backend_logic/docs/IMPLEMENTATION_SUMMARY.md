@@ -1,6 +1,6 @@
 # Implementation Summary: Logging, Metrics, and Plugin System
 
-This document summarizes the changes made to implement the logging/metrics component and plugin-based system in the CV Quality Scanner application.
+This document summarizes the changes made to implement the logging/metrics component and plugin-based system in the Projection application.
 
 ## Overview
 

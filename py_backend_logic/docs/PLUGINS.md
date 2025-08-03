@@ -1,6 +1,6 @@
 # Plugin System
 
-This document provides information about the plugin system implemented in the CV Quality Scanner application.
+This document provides information about the plugin system implemented in the Projection application.
 
 ## Overview
 

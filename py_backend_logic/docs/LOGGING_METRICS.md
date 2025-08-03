@@ -1,6 +1,6 @@
 # Logging and Metrics System
 
-This document provides information about the logging and metrics system implemented in the CV Quality Scanner application.
+This document provides information about the logging and metrics system implemented in the Projection application.
 
 ## Logging System
 

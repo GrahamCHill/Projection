@@ -1,6 +1,6 @@
 # Multi-Tenancy Implementation
 
-This document provides information about the multi-tenancy system implemented in the CV Quality Scanner application.
+This document provides information about the multi-tenancy system implemented in the Projection application.
 
 ## Overview
 

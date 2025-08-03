@@ -1,6 +1,6 @@
 # PostgreSQL Migration Guide
 
-This document provides information about the migration from MySQL/SQLite to PostgreSQL in the CV Quality Scanner application.
+This document provides information about the migration from MySQL/SQLite to PostgreSQL in the Projection application.
 
 ## Overview
 

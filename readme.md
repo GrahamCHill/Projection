@@ -264,7 +264,7 @@ The Projection is licensed under the GNU Lesser General Public License (LGPL) v3
 This project originated from an idea after seeing a tool created by my department head where I currently work, which 
 scanned pdf files and scored them using Groq LLMs.
 
-This project uses the Groq AI API to perform the CV quality checks. Groq is a powerful AI provider that offers a wide
+This project uses the Groq AI API to perform the functions of Projection. Groq is a powerful AI provider that offers a wide
 range of AI services, including natural language processing, text to speech, and more. You can learn more about Groq
 and sign up for an account at https://groq.com/.
 

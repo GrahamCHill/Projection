@@ -1,6 +1,6 @@
 # Database Query Endpoint Documentation
 
-This document provides information about the new database query endpoint added to the CV Quality Scanner application.
+This document provides information about the new database query endpoint added to the Projection application.
 
 ## Overview
 

@@ -14,12 +14,13 @@ from sqlalchemy.orm import Session
 from core.logging_manager import get_logger, logging_manager
 from core.metrics_manager import metrics_manager
 from core.middleware import LoggingMiddleware, MetricsMiddleware
-from plugins.plugin_system import plugin_manager
+
 
 # Import database module
 from core.database import init_db, get_session, get_db_type, CVDocument, User, Role, Permission, UserRole, RolePermission
 # Import API key manager
 from core.api_key_manager import GroqApiKeyManager
+# from plugins.plugin_system import plugin_manager
 
 # Create logger
 logger = get_logger("main")
@@ -100,9 +101,9 @@ app.add_middleware(
 )
 
 # Initialize plugin system
-logger.info("Initializing plugin system")
-plugin_count = plugin_manager.load_and_initialize_plugins(app)
-logger.info(f"Initialized {plugin_count} plugins")
+# logger.info("Initializing plugin system")
+# plugin_count = plugin_manager.load_and_initialize_plugins(app)
+# logger.info(f"Initialized {plugin_count} plugins")
 
 # Initialize the API key manager
 api_key_manager = GroqApiKeyManager()
