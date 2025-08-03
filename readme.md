@@ -278,3 +278,8 @@ and sign up for an account at https://grok.com/.
 - The project is designed to be easily deployable using Docker, allowing for quick setup and configuration
     in various environments.
 - The project is actively maintained and updated with new features and improvements based on user feedback and contributions
+- Please be aware that while the project is licensed under the LGPL, it is not intended for commercial use or 
+distribution without proper attribution and compliance with the license terms, especially if you plan to use it in a
+    commercial product or service.
+- If you wish to use this project in a commercial context, please contact me for further discussion and potential 
+custom licensing arrangements.
