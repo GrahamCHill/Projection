@@ -5,6 +5,10 @@ missing sections, formatting problems, and readability. It is designed to help j
 increase their chances of getting hired. It can also be used by recruiters to quickly assess the quality of a CV, or by
 companies to ensure that applicant CVs are compliant with their standards.
 
+The project follows the following architecture:  
+![Projection Stack Design](Project_Images/project_design_update.svg)
+
+
 ## Usage
 To use Projection, you can run the shell or batch script provided in the repository. The script will load a
 frontend interface that allows you to upload a CV file and scan it for quality issues. The script will also provide
