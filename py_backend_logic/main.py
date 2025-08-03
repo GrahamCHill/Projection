@@ -1,6 +1,4 @@
 import json
-import sys
-import os
 from fastapi import Request, Depends
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
@@ -11,17 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 import uvicorn
 from sqlalchemy.orm import Session
-
-# Add the parent directory to the Python path so we can import py_backend_logic
-# This is critical for Docker where the working directory is /app
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_dir)
-# Also add the current directory to the path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-# Print paths for debugging
-print(f"Python path: {sys.path}")
-print(f"Current directory: {os.getcwd()}")
-print(f"Parent directory added to path: {parent_dir}")
 
 # Import logging and metrics systems
 from py_backend_logic.core.logging_manager import get_logger, logging_manager
