@@ -11,3 +11,5 @@ py_backend_logic/groq_api_status.txt
 go_backend/main
 /ToDo.txt
 .output.txt
+/metrics/*.json
+/logs
