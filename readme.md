@@ -111,6 +111,8 @@ This will set up the backend, frontend, and optionally a MySQL database.
 ### Running with Docker Compose
 To start all services, run the following command in the root directory of the repository:
 ```
+docker-compose down --volumes --remove-orphans
+docker-compose build --no-cache
 docker-compose up -d
 ```
 

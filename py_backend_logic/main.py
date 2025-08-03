@@ -17,7 +17,7 @@ from middleware import LoggingMiddleware, MetricsMiddleware
 from plugin_system import plugin_manager
 
 # Import database module
-from database import init_db, get_session, get_db_type, CVDocument
+from database import init_db, get_session, get_db_type, CVDocument, User, Role, Permission, UserRole, RolePermission
 # Import API key manager
 from api_key_manager import GroqApiKeyManager
 
@@ -192,6 +192,118 @@ def get_db_info():
         "db_type": get_db_type(),
         "status": "connected"
     }
+
+@app.get("/api/db/query/{table_name}")
+def query_database(
+    request: Request,
+    table_name: str,
+    db: Session = Depends(get_session),
+    limit: int = 100,
+    offset: int = 0
+):
+    """
+    Query the database with a simple filtering mechanism.
+    
+    Parameters:
+    - table_name: The name of the table to query (users, roles, permissions, cv_documents)
+    - limit: Maximum number of records to return (default: 100)
+    - offset: Number of records to skip (default: 0)
+    - Additional query parameters will be used as filters (e.g., ?id=1&name=test)
+    
+    Returns:
+    - List of records matching the query
+    - Metadata including total count and available filters
+    """
+    # Map table names to SQLAlchemy models
+    table_map = {
+        "users": User,
+        "roles": Role,
+        "permissions": Permission,
+        "user_roles": UserRole,
+        "role_permissions": RolePermission,
+        "cv_documents": CVDocument
+    }
+    
+    # Check if the requested table exists
+    if table_name not in table_map:
+        return JSONResponse(
+            status_code=400,
+            content={"error": f"Invalid table name. Available tables: {', '.join(table_map.keys())}"}
+        )
+    
+    # Get the model class for the requested table
+    model = table_map[table_name]
+    
+    # Start building the query
+    query = db.query(model)
+    
+    # Get query parameters for filtering
+    query_params = dict(request.query_params)
+    
+    # Remove pagination parameters from filters
+    if 'limit' in query_params:
+        del query_params['limit']
+    if 'offset' in query_params:
+        del query_params['offset']
+    
+    # Apply filters based on query parameters
+    for key, value in query_params.items():
+        # Check if the model has this attribute
+        if hasattr(model, key):
+            # Handle different filter types
+            if value.lower() == 'null':
+                query = query.filter(getattr(model, key) == None)
+            elif value.lower() == 'not_null':
+                query = query.filter(getattr(model, key) != None)
+            elif value.startswith('like:'):
+                # Support LIKE queries with like:pattern
+                pattern = value[5:]
+                query = query.filter(getattr(model, key).like(f"%{pattern}%"))
+            elif value.startswith('gt:'):
+                # Support greater than with gt:value
+                try:
+                    val = float(value[3:])
+                    query = query.filter(getattr(model, key) > val)
+                except ValueError:
+                    pass
+            elif value.startswith('lt:'):
+                # Support less than with lt:value
+                try:
+                    val = float(value[3:])
+                    query = query.filter(getattr(model, key) < val)
+                except ValueError:
+                    pass
+            else:
+                # Default exact match
+                query = query.filter(getattr(model, key) == value)
+    
+    # Get total count before pagination
+    total_count = query.count()
+    
+    # Apply pagination
+    query = query.limit(limit).offset(offset)
+    
+    # Execute the query and return results
+    try:
+        results = query.all()
+        
+        # Get column names for the model
+        columns = [column.name for column in model.__table__.columns]
+        
+        return {
+            "data": results,
+            "metadata": {
+                "total_count": total_count,
+                "limit": limit,
+                "offset": offset,
+                "available_filters": columns
+            }
+        }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Database query error: {str(e)}"}
+        )
 
 @app.get("/api/groq/status")
 def get_groq_api_status():
