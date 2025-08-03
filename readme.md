@@ -283,3 +283,10 @@ distribution without proper attribution and compliance with the license terms, e
     commercial product or service.
 - If you wish to use this project in a commercial context, please contact me for further discussion and potential 
 custom licensing arrangements.
+- Commercial use is considered as using the project in a way that generates revenue or profit, such as selling a product
+or service that incorporates the project, or using the project as part of a commercial offering. It does not include
+    personal or non-commercial use, such as using the project for personal projects, learning, non-profit purposes, or 
+if you are not charging for the use of this project.
+- Small-scale commercial use, such as using the project in a personal business or side project, is generally acceptable
+    under the LGPL license, as long as you comply with the license terms and provide proper attribution and credit to the original authors.
+- If you have any questions or concerns about the licensing or commercial use of this project, please feel free to reach out to me directly for clarification or discussion.
