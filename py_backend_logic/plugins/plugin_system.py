@@ -8,7 +8,7 @@ import abc
 from pathlib import Path
 from dotenv import load_dotenv
 
-from logging_manager import get_logger
+from py_backend_logic.core.logging_manager import get_logger
 
 # Load environment variables
 load_dotenv()

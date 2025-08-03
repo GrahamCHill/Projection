@@ -13,3 +13,4 @@ go_backend/main
 .output.txt
 /metrics/*.json
 /logs
+groq_api_status.txt
