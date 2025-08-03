@@ -4,11 +4,10 @@ This document provides information about the database system implemented in the 
 
 ## Overview
 
-The application supports two database backends:
-1. **SQLite** (default) - A file-based database that requires no additional setup
-2. **MySQL** - A more robust database system for production environments
-
-The system is designed to allow easy switching between these database types when initially setting up an instance.
+The application uses PostgreSQL as its database backend:
+- **PostgreSQL** - A powerful, open-source object-relational database system with over 30 years of active development
+- Provides robustness, performance, and advanced features for production environments
+- Supports complex queries, foreign keys, and many other features
 
 ## Configuration
 
@@ -18,30 +17,24 @@ Database configuration is managed through environment variables, which can be se
 
 | Variable | Description | Default Value |
 |----------|-------------|---------------|
-| `DB_TYPE` | Database type (`sqlite` or `mysql`) | `sqlite` |
-| `SQLITE_PATH` | SQLite database file path | `sqlite:///./cv_scanner.db` |
-| `DB_HOST` | MySQL host | `localhost` |
-| `DB_PORT` | MySQL port | `3306` |
-| `DB_USER` | MySQL username | `root` |
-| `DB_PASSWORD` | MySQL password | `password` |
-| `DB_NAME` | MySQL database name | `cv_scanner` |
+| `DB_HOST` | PostgreSQL host | `localhost` |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_USER` | PostgreSQL username | `postgres` |
+| `DB_PASSWORD` | PostgreSQL password | `password` |
+| `DB_NAME` | PostgreSQL database name | `projection` |
 
 ### Example .env Configuration
 
 ```
 # Database Configuration
-# Options: sqlite, mysql
-DB_TYPE=sqlite
+# PostgreSQL is the only supported database
 
-# SQLite Configuration (used when DB_TYPE=sqlite)
-SQLITE_PATH=sqlite:///./cv_scanner.db
-
-# MySQL Configuration (used when DB_TYPE=mysql)
+# PostgreSQL Configuration
 DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
+DB_PORT=5432
+DB_USER=postgres
 DB_PASSWORD=password
-DB_NAME=cv_scanner
+DB_NAME=projection
 ```
 
 ## Database Models
@@ -76,34 +69,38 @@ The following API endpoints are available for database operations:
 A test script is provided to verify database functionality:
 
 ```bash
-# Test SQLite (default)
+# Test PostgreSQL connection and operations
 python test_db.py
-
-# Test MySQL (if configured)
-python test_db.py --mysql
 ```
 
 ## Docker Setup
 
 When using Docker, the database configuration is managed through environment variables in the `docker-compose.yml` file.
 
-### Using SQLite with Docker
+### PostgreSQL with Docker
 
-To use SQLite (default), no additional configuration is needed. You may want to comment out the `depends_on` section for the MySQL service in the backend service configuration.
+The application is configured to use PostgreSQL by default:
 
-### Using MySQL with Docker
+1. The PostgreSQL service is defined in `docker-compose.yml`
+2. The backend service depends on the PostgreSQL service
+3. Data is persisted in a Docker volume named `postgres_data`
 
-To use MySQL:
-1. Set `DB_TYPE=mysql` in your `.env` file
-2. Ensure the MySQL service is uncommented in `docker-compose.yml`
-3. Make sure the backend service has the `depends_on` section for MySQL uncommented
+You can customize the PostgreSQL configuration by setting the following environment variables:
 
-## Switching Database Types
+```
+DB_HOST=postgres
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_secure_password
+DB_NAME=your_database_name
+```
 
-To switch between database types:
+## Database Migration
 
-1. Update the `DB_TYPE` environment variable in your `.env` file
-2. If using Docker, adjust the `docker-compose.yml` file as needed
-3. Restart the application
+If you're migrating from MySQL or SQLite to PostgreSQL, you'll need to:
 
-Note that data is not automatically migrated between database types. If you need to migrate data, you'll need to implement a custom migration script.
+1. Export your data from the previous database
+2. Transform the data to match PostgreSQL's format if necessary
+3. Import the data into PostgreSQL
+
+PostgreSQL provides tools like `pg_dump` and `psql` for data migration. For complex migrations, consider using a dedicated migration tool or writing custom migration scripts.

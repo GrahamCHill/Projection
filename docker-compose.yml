@@ -8,11 +8,9 @@ services:
       - "8000:8000"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
-      - DB_TYPE=${DB_TYPE:-sqlite}
-      - SQLITE_PATH=${SQLITE_PATH:-sqlite:///./projection.db}
-      - DB_HOST=${DB_HOST:-mysql}
-      - DB_PORT=${DB_PORT:-3306}
-      - DB_USER=${DB_USER:-root}
+      - DB_HOST=${DB_HOST:-postgres}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-password}
       - DB_NAME=${DB_NAME:-projection}
       - S3_ENDPOINT=${S3_ENDPOINT:-http://minio:9000}
@@ -30,19 +28,36 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-for-jwt}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      # Logging Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - CONSOLE_LOG_LEVEL=${CONSOLE_LOG_LEVEL:-INFO}
+      - FILE_LOG_LEVEL=${FILE_LOG_LEVEL:-DEBUG}
+      - LOG_DIR=${LOG_DIR:-logs}
+      - MAX_LOG_SIZE_MB=${MAX_LOG_SIZE_MB:-10}
+      - LOG_BACKUP_COUNT=${LOG_BACKUP_COUNT:-5}
+      # Metrics Configuration
+      - METRICS_ENABLED=${METRICS_ENABLED:-true}
+      - METRICS_RETENTION_MINUTES=${METRICS_RETENTION_MINUTES:-60}
+      - METRICS_SNAPSHOT_INTERVAL_SECONDS=${METRICS_SNAPSHOT_INTERVAL_SECONDS:-60}
+      - METRICS_DIR=${METRICS_DIR:-metrics}
+      # Plugin Configuration
+      - PLUGINS_ENABLED=${PLUGINS_ENABLED:-true}
+      - PLUGINS_DIR=${PLUGINS_DIR:-plugins}
+      - PLUGIN_CONFIG_FILE=${PLUGIN_CONFIG_FILE:-plugin_config.json}
     volumes:
       - ./py_backend_logic:/app
+      - ./logs:/app/logs
+      - ./metrics:/app/metrics
+      - ./plugins:/app/plugins
     restart: unless-stopped
     networks:
       - projection_network
     depends_on:
-      - mysql
+      - postgres
       - minio
       - qdrant
       - go_backend
       - redis
-    # Only when using MySQL
-    # Comment out the depends_on if using SQLite
     
   go_backend:
     build:
@@ -78,22 +93,26 @@ services:
     networks:
       - projection_network
 
-  # MySQL service (only used when DB_TYPE=mysql)
-  mysql:
-    image: mysql:8.0
-    container_name: projection_mysql
+  # PostgreSQL service
+  postgres:
+    image: postgres:15
+    container_name: projection_postgres
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-password}
-      - MYSQL_DATABASE=${DB_NAME:-projection}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_DB=${DB_NAME:-projection}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - projection_network
-    # To disable MySQL when using SQLite, you can comment out this service
-    # or set the profile to "mysql" and only enable it when needed
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # MinIO service (S3-compatible storage)
   minio:
@@ -154,7 +173,7 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  postgres_data:
   minio_data:
   qdrant_data:
   redis_data:

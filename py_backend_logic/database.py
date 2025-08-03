@@ -10,13 +10,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database configuration
-DB_TYPE = os.getenv("DB_TYPE", "sqlite").lower()  # Default to SQLite if not specified
+DB_TYPE = "postgres"  # Only PostgreSQL is supported
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "3306")
-DB_USER = os.getenv("DB_USER", "root")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
 DB_NAME = os.getenv("DB_NAME", "projection")
-SQLITE_PATH = os.getenv("SQLITE_PATH", "sqlite:///./projection.db")
 
 # Create the SQLAlchemy Base
 Base = declarative_base()
@@ -127,12 +126,9 @@ class CVDocument(Base):
 
 def get_database_url():
     """
-    Generate the database URL based on the configured database type
+    Generate the database URL for PostgreSQL
     """
-    if DB_TYPE == "mysql":
-        return f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    else:  # Default to SQLite
-        return SQLITE_PATH
+    return f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 def get_engine():
     """
@@ -159,6 +155,6 @@ def init_db():
 
 def get_db_type():
     """
-    Return the currently configured database type
+    Return the database type (always postgres)
     """
-    return DB_TYPE
+    return "postgres"

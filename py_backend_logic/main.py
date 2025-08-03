@@ -10,10 +10,19 @@ from pathlib import Path
 import uvicorn
 from sqlalchemy.orm import Session
 
+# Import logging and metrics systems
+from logging_manager import get_logger, logging_manager
+from metrics_manager import metrics_manager
+from middleware import LoggingMiddleware, MetricsMiddleware
+from plugin_system import plugin_manager
+
 # Import database module
 from database import init_db, get_session, get_db_type, CVDocument
 # Import API key manager
 from api_key_manager import GroqApiKeyManager
+
+# Create logger
+logger = get_logger("main")
 # Import integration API
 try:
     from integration_api import router as integration_router
@@ -49,12 +58,19 @@ try:
 except ImportError:
     AUTH_AVAILABLE = False
 
+# Import Metrics API
+try:
+    from metrics_api import router as metrics_router
+    METRICS_AVAILABLE = True
+except ImportError:
+    METRICS_AVAILABLE = False
+
 # Load the .env file
 load_dotenv()
 
 # Initialize database
 engine = init_db()
-print(f"Database initialized with type: {get_db_type()}")
+logger.info(f"Database initialized with type: {get_db_type()}")
 
 # Create FastAPI app
 app = FastAPI(title="Projection API")
@@ -70,6 +86,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add logging middleware
+app.add_middleware(
+    LoggingMiddleware,
+    exclude_paths=["/api/health", "/api/metrics"]
+)
+
+# Add metrics middleware
+app.add_middleware(
+    MetricsMiddleware,
+    metrics_manager=metrics_manager,
+    exclude_paths=["/api/health", "/api/metrics"]
+)
+
+# Initialize plugin system
+logger.info("Initializing plugin system")
+plugin_count = plugin_manager.load_and_initialize_plugins(app)
+logger.info(f"Initialized {plugin_count} plugins")
+
 # Initialize the API key manager
 api_key_manager = GroqApiKeyManager()
 api_key = api_key_manager.get_api_key()
@@ -80,27 +114,32 @@ client = Groq(api_key=api_key)
 # Include integration router if available
 if INTEGRATION_AVAILABLE:
     app.include_router(integration_router)
-    print("Integration API routes loaded")
+    logger.info("Integration API routes loaded")
 
 # Include GitHub router if available
 if GITHUB_AVAILABLE:
     app.include_router(github_router)
-    print("GitHub API routes loaded")
+    logger.info("GitHub API routes loaded")
     
     # Start the GitHub polling scheduler if available
     if GITHUB_SCHEDULER_AVAILABLE:
         github_scheduler.start_polling()
-        print("GitHub polling scheduler started")
+        logger.info("GitHub polling scheduler started")
 
 # Include Git LFS router if available
 if GIT_LFS_AVAILABLE:
     app.include_router(git_lfs_router)
-    print("Git LFS API routes loaded")
+    logger.info("Git LFS API routes loaded")
 
 # Include Auth router if available
 if AUTH_AVAILABLE:
     app.include_router(auth_router)
-    print("Authentication API routes loaded")
+    logger.info("Authentication API routes loaded")
+
+# Include Metrics router if available
+if METRICS_AVAILABLE:
+    app.include_router(metrics_router)
+    logger.info("Metrics API routes loaded")
 
 @app.get("/")
 async def root():

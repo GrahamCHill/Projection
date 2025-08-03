@@ -1,0 +1,14 @@
+{
+  "example_plugin": {
+    "greeting": "Hello from the example plugin!",
+    "enabled": true,
+    "log_level": "INFO",
+    "custom_setting": "This is a custom setting for the example plugin"
+  },
+  "another_plugin": {
+    "enabled": false,
+    "max_items": 100,
+    "timeout_seconds": 30,
+    "api_key": "your-api-key-here"
+  }
+}
