@@ -42,6 +42,13 @@ try:
 except ImportError:
     GIT_LFS_AVAILABLE = False
 
+# Import Auth API
+try:
+    from auth_api import router as auth_router
+    AUTH_AVAILABLE = True
+except ImportError:
+    AUTH_AVAILABLE = False
+
 # Load the .env file
 load_dotenv()
 
@@ -90,6 +97,11 @@ if GIT_LFS_AVAILABLE:
     app.include_router(git_lfs_router)
     print("Git LFS API routes loaded")
 
+# Include Auth router if available
+if AUTH_AVAILABLE:
+    app.include_router(auth_router)
+    print("Authentication API routes loaded")
+
 @app.get("/")
 async def root():
     return {"message": "Projection API is running"}
@@ -129,6 +141,10 @@ def list_json_files():
     files = [f.name for f in DATA_DIR.glob("*.json")]
     return {"files": files}
 
+# Import auth dependencies if available
+if AUTH_AVAILABLE:
+    from auth import get_current_user, has_permission, PermissionType, User
+
 # Database API endpoints
 @app.get("/api/db/info")
 def get_db_info():
@@ -157,38 +173,104 @@ def reload_groq_api_key():
         "message": "GROQ API key reloaded and client updated"
     }
 
-@app.post("/api/db/documents")
-def create_document(filename: str, content: str, db: Session = Depends(get_session)):
-    """Create a new CV document in the database"""
-    doc = CVDocument(filename=filename, content=content)
-    db.add(doc)
-    db.commit()
-    db.refresh(doc)
-    return doc
+# CV Document endpoints with role-based access control
+if AUTH_AVAILABLE:
+    # Protected endpoints requiring authentication
+    @app.post("/api/db/documents")
+    def create_document(
+        filename: str, 
+        content: str, 
+        db: Session = Depends(get_session),
+        current_user: User = Depends(get_current_user),
+        _: bool = Depends(has_permission("cv_document", PermissionType.ADD))
+    ):
+        """Create a new CV document in the database (requires cv_document add permission)"""
+        doc = CVDocument(filename=filename, content=content, user_id=current_user.id)
+        db.add(doc)
+        db.commit()
+        db.refresh(doc)
+        return doc
 
-@app.get("/api/db/documents")
-def list_documents(db: Session = Depends(get_session)):
-    """List all CV documents in the database"""
-    docs = db.query(CVDocument).all()
-    return docs
+    @app.get("/api/db/documents")
+    def list_documents(
+        db: Session = Depends(get_session),
+        current_user: User = Depends(get_current_user),
+        _: bool = Depends(has_permission("cv_document", PermissionType.VIEW))
+    ):
+        """List all CV documents in the database (requires cv_document view permission)"""
+        docs = db.query(CVDocument).all()
+        return docs
 
-@app.get("/api/db/documents/{doc_id}")
-def get_document(doc_id: int, db: Session = Depends(get_session)):
-    """Get a specific CV document by ID"""
-    doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
-    if not doc:
-        return JSONResponse(status_code=404, content={"error": "Document not found"})
-    return doc
+    @app.get("/api/db/documents/{doc_id}")
+    def get_document(
+        doc_id: int, 
+        db: Session = Depends(get_session),
+        current_user: User = Depends(get_current_user),
+        _: bool = Depends(has_permission("cv_document", PermissionType.VIEW))
+    ):
+        """Get a specific CV document by ID (requires cv_document view permission)"""
+        doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
+        if not doc:
+            return JSONResponse(status_code=404, content={"error": "Document not found"})
+        return doc
 
-@app.delete("/api/db/documents/{doc_id}")
-def delete_document(doc_id: int, db: Session = Depends(get_session)):
-    """Delete a CV document by ID"""
-    doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
-    if not doc:
-        return JSONResponse(status_code=404, content={"error": "Document not found"})
-    db.delete(doc)
-    db.commit()
-    return {"message": f"Document {doc_id} deleted"}
+    @app.delete("/api/db/documents/{doc_id}")
+    def delete_document(
+        doc_id: int, 
+        db: Session = Depends(get_session),
+        current_user: User = Depends(get_current_user),
+        _: bool = Depends(has_permission("cv_document", PermissionType.DELETE))
+    ):
+        """Delete a CV document by ID (requires cv_document delete permission)"""
+        doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
+        if not doc:
+            return JSONResponse(status_code=404, content={"error": "Document not found"})
+        
+        # Only allow users to delete their own documents unless they're an admin
+        admin_roles = [role.name for role in current_user.user_roles]
+        if doc.user_id != current_user.id and "admin" not in admin_roles:
+            return JSONResponse(
+                status_code=403, 
+                content={"error": "You can only delete your own documents"}
+            )
+            
+        db.delete(doc)
+        db.commit()
+        return {"message": f"Document {doc_id} deleted"}
+else:
+    # Unprotected endpoints if auth is not available
+    @app.post("/api/db/documents")
+    def create_document(filename: str, content: str, db: Session = Depends(get_session)):
+        """Create a new CV document in the database"""
+        doc = CVDocument(filename=filename, content=content)
+        db.add(doc)
+        db.commit()
+        db.refresh(doc)
+        return doc
+
+    @app.get("/api/db/documents")
+    def list_documents(db: Session = Depends(get_session)):
+        """List all CV documents in the database"""
+        docs = db.query(CVDocument).all()
+        return docs
+
+    @app.get("/api/db/documents/{doc_id}")
+    def get_document(doc_id: int, db: Session = Depends(get_session)):
+        """Get a specific CV document by ID"""
+        doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
+        if not doc:
+            return JSONResponse(status_code=404, content={"error": "Document not found"})
+        return doc
+
+    @app.delete("/api/db/documents/{doc_id}")
+    def delete_document(doc_id: int, db: Session = Depends(get_session)):
+        """Delete a CV document by ID"""
+        doc = db.query(CVDocument).filter(CVDocument.id == doc_id).first()
+        if not doc:
+            return JSONResponse(status_code=404, content={"error": "Document not found"})
+        db.delete(doc)
+        db.commit()
+        return {"message": f"Document {doc_id} deleted"}
 
 # This allows the file to be run directly with python
 if __name__ == "__main__":
