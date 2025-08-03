@@ -253,6 +253,10 @@ curl -X GET "http://localhost:8000/api/github/polling/status"
 If you want to contribute to the Projection, you can fork the repository and create a pull request. You can 
 also report issues or suggest features by opening an issue in the repository.
 
+Please be aware that of the rules of the [Contributor License Agreement](CLA.md) (CLA) before contributing to the project.
+
+Please also read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to contribute to the project.
+
 ## License
 The Projection is licensed under the GNU Lesser General Public License (LGPL) v3.0. See the LICENSE file for more details.
 
