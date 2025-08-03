@@ -14,8 +14,8 @@ This will set up all components of the application, including the backend, front
 Then you should also set up a user for security purposes, as the application uses a multi-tenancy architecture
 to allow multiple users to access the same application without interfering with each other.
 ## Requirements
-Projection (while it doesn't require an LLM to run) is designed to work with the Grok AI API, which requires an API key.
-You can sign up for a free account at [Grok AI](https://grok.com/).
+Projection (while it doesn't require an LLM to run) is designed to work with the Groq AI API, which requires an API key.
+You can sign up for a free account at [Groq AI](https://groq.com/).
 You should add your api key to the docker-compose set-up command when running (in future I might look at other ways to 
 add the API key, but for now this is the simplest way to do it).
 ```
@@ -264,9 +264,9 @@ The Projection is licensed under the GNU Lesser General Public License (LGPL) v3
 This project originated from an idea after seeing a tool created by my department head where I currently work, which 
 scanned pdf files and scored them using Groq LLMs.
 
-This project uses the Grok AI API to perform the CV quality checks. Grok is a powerful AI provider that offers a wide
-range of AI services, including natural language processing, computer vision, and more. You can learn more about Grok
-and sign up for an account at https://grok.com/.
+This project uses the Groq AI API to perform the CV quality checks. Groq is a powerful AI provider that offers a wide
+range of AI services, including natural language processing, computer vision, and more. You can learn more about Groq
+and sign up for an account at https://groq.com/.
 
 
 #### Additional Notes
