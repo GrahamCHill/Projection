@@ -1,72 +1,31 @@
 # Projection
 ## About
-This is a simple tool to scan CVs for quality and compliance with best practices. It checks for common issues such as 
-missing sections, formatting problems, and readability. It is designed to help job seekers improve their CVs and 
-increase their chances of getting hired. It can also be used by recruiters to quickly assess the quality of a CV, or by
-companies to ensure that applicant CVs are compliant with their standards.
+This tool started as a personal project to understand how to parse data to LLMs, and quickly evolved in scope to
+become a full-fledged project management and unified view of software projects.
 
 The project follows the following architecture:  
 ![Projection Stack Design](Project_Images/project_design_update.svg)
 
 
 ## Usage
-To use Projection, you can run the shell or batch script provided in the repository. The script will load a
-frontend interface that allows you to upload a CV file and scan it for quality issues. The script will also provide
-feedback on how to improve the CV and increase its chances of getting hired.
+To use Projection, you should make use of the docker-compose file in the root directory of the repository.
+This will set up all components of the application, including the backend, frontend, and database.
 
+Then you should also set up a user for security purposes, as the application uses a multi-tenancy architecture
+to allow multiple users to access the same application without interfering with each other.
 ## Requirements
-Projection requires that you have signed up for an account with Groq (or another AI provider) and have
-obtained an API key. You will need to set the `GROQ_API_KEY` environment variable to your API key before running
-the script. You can do this by creating a `.env` file in the project root directory with the following content:
+Projection (while it doesn't require an LLM to run) is designed to work with the Grok AI API, which requires an API key.
+You can sign up for a free account at [Grok AI](https://grok.com/).
+You should add your api key to the docker-compose set-up command when running (in future I might look at other ways to 
+add the API key, but for now this is the simplest way to do it).
 ```
 GROQ_API_KEY=your_api_key_here
 
-# Database Configuration (optional)
-DB_TYPE=sqlite  # Options: sqlite, mysql
 ```
 Note that there is a `.env.sample` file in the project root directory that you can use as a template.
 
 ### Database Configuration
-The application supports two database backends:
-1. **SQLite** (default) - A file-based database that requires no additional setup
-2. **MySQL** - A more robust database system for production environments
-
-To configure the database, you can set the following environment variables in your `.env` file:
-```
-# Database Configuration
-# Options: sqlite, mysql
-DB_TYPE=sqlite
-
-# SQLite Configuration (used when DB_TYPE=sqlite)
-SQLITE_PATH=sqlite:///./cv_scanner.db
-
-# MySQL Configuration (used when DB_TYPE=mysql)
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=password
-DB_NAME=cv_scanner
-
-# S3 Storage Configuration
-S3_ENDPOINT=http://minio:9000
-S3_ACCESS_KEY=minioadmin
-S3_SECRET_KEY=minioadmin
-S3_BUCKET_NAME=cv-documents
-USE_MOCK_S3=true
-
-# Vector Database Configuration
-VECTOR_DB_URL=http://qdrant:6333
-
-# GitHub Configuration
-GITHUB_TOKEN=your_github_token_here
-GITHUB_ENTERPRISE_URL=
-GITHUB_POLLING_INTERVAL=600
-GITHUB_USERS=username1,username2
-GITHUB_ORGANIZATIONS=org1,org2
-```
-
-For more detailed information about the database system, please refer to the [Database Documentation](./py_backend_logic/DATABASE.md).
-
+The program used to use SQLite or MySQL as the database backend, but now it uses PostgreSQL as the default database.
 You will also need to have Python 3.8 or higher installed on your system, as well as the required Python packages.
 
 ### Core Dependencies
@@ -150,10 +109,6 @@ This ensures the Go application builds correctly regardless of the host platform
 ### Configuration with Docker
 The docker-compose.yml file includes configuration for several services:
 
-#### Database Configuration
-- **SQLite (Default)**: No additional configuration needed
-- **MySQL**: To use MySQL instead of SQLite, set the `DB_TYPE` environment variable to `mysql` in your `.env` file
-
 #### S3-Compatible Storage
 The application includes a toggleable S3-compatible storage service using MinIO:
 - **Mock S3 (Default)**: Uses MinIO as a local S3-compatible storage (use username and password `minioadmin` if using 
@@ -207,13 +162,6 @@ The application provides several API endpoints for interacting with the S3 stora
 
 ### Status Endpoint
 - `GET /api/integration/status`: Get the status of the integration services
-
-### CV Document Operations
-- `POST /api/integration/upload-cv`: Upload a CV document, store it in S3, and create a vector embedding
-- `GET /api/integration/list-cvs`: List CV documents stored in the vector database
-- `GET /api/integration/get-cv/{document_id}`: Get a CV document by ID
-- `POST /api/integration/search-similar`: Search for similar CV documents based on a text query
-- `DELETE /api/integration/delete-cv/{document_id}`: Delete a CV document by ID
 
 ### S3 Storage Toggle
 - `GET /api/integration/toggle-mock-s3`: Toggle between mock S3 and real S3 (for demonstration purposes)
@@ -300,23 +248,6 @@ curl -X POST "http://localhost:8000/api/github/polling/poll-user/username"
 curl -X GET "http://localhost:8000/api/github/polling/status"
 ```
 
-### Example Usage for Integration API
-
-#### Uploading a CV
-```bash
-curl -X POST "http://localhost:8000/api/integration/upload-cv" \
-  -H "Content-Type: multipart/form-data" \
-  -F "file=@/path/to/your/cv.pdf" \
-  -F "title=My CV" \
-  -F "description=Software Engineer CV"
-```
-
-#### Searching for Similar CVs
-```bash
-curl -X POST "http://localhost:8000/api/integration/search-similar" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "software engineer with python experience"}'
-```
 
 ## Contributing
 If you want to contribute to the Projection, you can fork the repository and create a pull request. You can 
@@ -326,12 +257,24 @@ also report issues or suggest features by opening an issue in the repository.
 The Projection is licensed under the GNU Lesser General Public License (LGPL) v3.0. See the LICENSE file for more details.
 
 ### Acknowledgements
-This project is inspired by a project created by my one of my superiors at work, who used it to scan CVs for quality
-and compliance with best practices. I have just adapted it to have a more user-friendly interface and to be more flexible
-in regard to the extensibility of both the frontend and backend. 
+This project originated from an idea after seeing a tool created by my department head where I currently work, which 
+scanned pdf files and scored them using Groq LLMs.
 
 This project uses the Grok AI API to perform the CV quality checks. Grok is a powerful AI provider that offers a wide
 range of AI services, including natural language processing, computer vision, and more. You can learn more about Grok
 and sign up for an account at https://grok.com/.
 
 
+#### Additional Notes
+- This application falls outside the scope of any contracts or agreements with my current employer.
+- It is developed independently and is not affiliated with any specific company or organization.
+- The project is open-source and available for anyone to use, modify, and contribute to.
+- The project is designed to be modular and extensible, allowing for easy integration with other tools and services.
+- The project is intended to be a learning resource and a practical tool for managing software projects.
+- The project is not intended to be a commercial product, but rather a personal and community-driven initiative, as
+    such, it is free to use and distribute.
+- The project is built with a focus on simplicity, usability, and flexibility, making it suitable for a wide range of
+    use cases in software project management.
+- The project is designed to be easily deployable using Docker, allowing for quick setup and configuration
+    in various environments.
+- The project is actively maintained and updated with new features and improvements based on user feedback and contributions
