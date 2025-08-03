@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-from py_backend_logic.core.logging_manager import get_logger
+from logging_manager import get_logger
 
 # Load environment variables
 load_dotenv()

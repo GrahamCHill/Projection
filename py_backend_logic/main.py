@@ -11,32 +11,32 @@ import uvicorn
 from sqlalchemy.orm import Session
 
 # Import logging and metrics systems
-from py_backend_logic.core.logging_manager import get_logger, logging_manager
-from py_backend_logic.core.metrics_manager import metrics_manager
-from py_backend_logic.core.middleware import LoggingMiddleware, MetricsMiddleware
-from py_backend_logic.plugins.plugin_system import plugin_manager
+from core.logging_manager import get_logger, logging_manager
+from core.metrics_manager import metrics_manager
+from core.middleware import LoggingMiddleware, MetricsMiddleware
+from plugins.plugin_system import plugin_manager
 
 # Import database module
-from py_backend_logic.core.database import init_db, get_session, get_db_type, CVDocument, User, Role, Permission, UserRole, RolePermission
+from core.database import init_db, get_session, get_db_type, CVDocument, User, Role, Permission, UserRole, RolePermission
 # Import API key manager
-from py_backend_logic.core.api_key_manager import GroqApiKeyManager
+from core.api_key_manager import GroqApiKeyManager
 
 # Create logger
 logger = get_logger("main")
 # Import integration API
 try:
-    from py_backend_logic.api.integration_api import router as integration_router
+    from api.integration_api import router as integration_router
     INTEGRATION_AVAILABLE = True
 except ImportError:
     INTEGRATION_AVAILABLE = False
 
 # Import GitHub API
 try:
-    from py_backend_logic.api.github_api import router as github_router
+    from api.github_api import router as github_router
     GITHUB_AVAILABLE = True
     # Try to import scheduler if available
     try:
-        from py_backend_logic.github.scheduler import github_scheduler
+        from github.scheduler import github_scheduler
         GITHUB_SCHEDULER_AVAILABLE = True
     except ImportError:
         GITHUB_SCHEDULER_AVAILABLE = False
@@ -46,21 +46,21 @@ except ImportError:
 
 # Import Git LFS API
 try:
-    from py_backend_logic.api.git_lfs_api import router as git_lfs_router
+    from api.git_lfs_api import router as git_lfs_router
     GIT_LFS_AVAILABLE = True
 except ImportError:
     GIT_LFS_AVAILABLE = False
 
 # Import Auth API
 try:
-    from py_backend_logic.api.auth_api import router as auth_router
+    from api.auth_api import router as auth_router
     AUTH_AVAILABLE = True
 except ImportError:
     AUTH_AVAILABLE = False
 
 # Import Metrics API
 try:
-    from py_backend_logic.api.metrics_api import router as metrics_router
+    from api.metrics_api import router as metrics_router
     METRICS_AVAILABLE = True
 except ImportError:
     METRICS_AVAILABLE = False
@@ -182,7 +182,7 @@ def list_json_files():
 
 # Import auth dependencies if available
 if AUTH_AVAILABLE:
-    from py_backend_logic.core.auth import get_current_user, has_permission, PermissionType, User
+    from core.auth import get_current_user, has_permission, PermissionType, User
 
 # Database API endpoints
 @app.get("/api/db/info")
