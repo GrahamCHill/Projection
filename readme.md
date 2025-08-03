@@ -265,7 +265,7 @@ This project originated from an idea after seeing a tool created by my departmen
 scanned pdf files and scored them using Groq LLMs.
 
 This project uses the Groq AI API to perform the CV quality checks. Groq is a powerful AI provider that offers a wide
-range of AI services, including natural language processing, computer vision, and more. You can learn more about Groq
+range of AI services, including natural language processing, text to speech, and more. You can learn more about Groq
 and sign up for an account at https://groq.com/.
 
 
