@@ -58,6 +58,7 @@ func main() {
     addr := fmt.Sprintf(":%d", config.Port)
     log.Printf("Starting Git LFS backend server on %s", addr)
     log.Fatal(http.ListenAndServe(addr, nil))
+
 }
 
 // healthCheckHandler provides a simple health check endpoint

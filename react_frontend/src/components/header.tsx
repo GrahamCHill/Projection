@@ -6,10 +6,13 @@ const Header: React.FC = () => {
     return (
         <>
             {/* Header with Main site title and menu */}
-            <header className="bg-blue-600 text-white py-4 px-6 shadow-md">
-                <h1 className="text-xl font-bold"><Link to="/"> Projection</Link></h1>
+            <header className="bg-blue-600 text-white px-6 shadow-md left-0 right-0 z-50 flex items-center gap-8"
+             style={{ position: 'fixed', top: 0, width: '100vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+            }}>
+                <h1 className="text-xl font-bold" style={{paddingLeft: '1.5rem'}}><Link to="/"> Projection</Link></h1>
+                <MenuComponent  />
             </header>
-            <MenuComponent />
+
         </>
     );
 };
