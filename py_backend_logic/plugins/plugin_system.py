@@ -329,6 +329,3 @@ class PluginManager:
                 logger.exception(f"Error in hook {hook_name}: {str(e)}")
         
         return results
-
-# Create a singleton instance
-plugin_manager = PluginManager()
