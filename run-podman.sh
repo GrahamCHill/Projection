@@ -11,7 +11,7 @@ set -euo pipefail
 # Notes:
 # - Requires Podman >= 4.x
 # - Designed for rootless Podman; run as your normal user
-# - Reads environment overrides from py_backend_logic/.env if present
+# - Reads environment overrides from .env at project root if present
 
 PROJECT_NAME="projection"
 NETWORK_NAME="projection_network"
@@ -40,11 +40,11 @@ ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Load .env if provided to supply variables similar to docker compose
 load_env() {
-  if [[ -f "$ROOT_DIR/py_backend_logic/.env" ]]; then
-    echo "Loading environment from py_backend_logic/.env"
+  if [[ -f "$ROOT_DIR/.env" ]]; then
+    echo "Loading environment from .env at project root"
     set -a
     # shellcheck disable=SC1091
-    . "$ROOT_DIR/py_backend_logic/.env"
+    . "$ROOT_DIR/.env"
     set +a
   fi
 }

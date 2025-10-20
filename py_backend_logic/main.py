@@ -65,8 +65,14 @@ try:
 except ImportError:
     METRICS_AVAILABLE = False
 
-# Load the .env file
-load_dotenv()
+# Load the .env file from project root (.env moved from py_backend_logic/ to repo root)
+ROOT_DIR = Path(__file__).resolve().parent.parent
+ENV_PATH = ROOT_DIR / ".env"
+if ENV_PATH.exists():
+    load_dotenv(dotenv_path=ENV_PATH)
+else:
+    # Fallback: attempt default search so env provided by Docker/Podman or shell is still honored
+    load_dotenv()
 
 # Initialize database
 engine = init_db()

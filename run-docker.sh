@@ -11,6 +11,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # Print banner
 echo -e "${GREEN}=================================${NC}"
 echo -e "${GREEN}        Projection Docker        ${NC}"
@@ -30,6 +32,17 @@ fi
 if ! command_exists docker-compose; then
   echo -e "${YELLOW}Docker Compose is not installed. Please install Docker Compose to run the application.${NC}"
   exit 1
+fi
+
+# Load env vars from project root .env to mirror Compose and Podman behavior
+if [ -f "$ROOT_DIR/.env" ]; then
+  echo -e "${GREEN}Loading environment from .env at project root${NC}"
+  set -a
+  # shellcheck disable=SC1091
+  . "$ROOT_DIR/.env"
+  set +a
+else
+  echo -e "${YELLOW}.env not found at project root. Using shell environment and defaults from docker-compose.yml.${NC}"
 fi
 
 # Check for GitHub token
